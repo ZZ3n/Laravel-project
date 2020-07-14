@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUsersTableOnoffmix extends Migration
+class CreateUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -22,6 +22,7 @@ class CreateUsersTableOnoffmix extends Migration
                 ->nullable(false);
             $table->char('password',20)
                 ->nullable(false);
+            $table->unique('email');
             $table->timestamps();
         });
     }

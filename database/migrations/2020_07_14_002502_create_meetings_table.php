@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMeetingsTableOnoffmix extends Migration
+class CreateMeetingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -19,7 +19,7 @@ class CreateMeetingsTableOnoffmix extends Migration
                 ->nullable(false);
             $table->char('founder',20)->nullable(false);
             $table->integer('views')
-                ->default(0);
+                ->default(0)->unsigned();
             $table->text('contents')
                 ->nullable(false);
             $table->timestamps();
@@ -35,7 +35,7 @@ class CreateMeetingsTableOnoffmix extends Migration
     public function down()
     {
         Schema::table('meetings',function (Blueprint $table) {
-            $table->dropForeign('meetings_founder_foreign');
+        $table->dropForeign('meetings_founder_foreign');
         });
         Schema::dropIfExists('meetings');
     }
