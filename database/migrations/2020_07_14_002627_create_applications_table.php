@@ -14,7 +14,7 @@ class CreateApplicationsTable extends Migration
     public function up()
     {
         Schema::create('applications', function (Blueprint $table) {
-        $table->char('user_id',20);
+        $table->char('user_id',50);
         $table->unsignedInteger('group_id');
         $table->primary(['user_id','group_id']);
         $table->boolean('approval')
@@ -22,7 +22,7 @@ class CreateApplicationsTable extends Migration
         $table->foreign('user_id')
         ->references('id')->on('users');
         $table->foreign('group_id')
-        ->references('_id')->on('groups');
+        ->references('id')->on('groups');
         $table->timestamps();
         });
     }

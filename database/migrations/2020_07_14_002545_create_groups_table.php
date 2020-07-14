@@ -14,20 +14,25 @@ class CreateGroupsTable extends Migration
     public function up()
     {
         Schema::create('groups', function (Blueprint $table) {
-            $table->increments('_id');
+            $table->increments('id');
             $table->unsignedInteger('meeting_id')
                 ->nullable(false);
-            $table->dateTime('apv_date');
-            $table->dateTime('act_date');
-            $table->integer('full',false,true)
+            // apply date
+            $table->dateTime('apply_start_date');
+            $table->dateTime('apply_end_date');
+            // action date
+            $table->dateTime('act_start_date');
+            $table->dateTime('act_end_date');
+
+            $table->integer('capacity',false,true)
                 ->nullable(false);
-            $table->tinyInteger('apv_opt')
-                ->default(0);
+            // first = first come first serve, check = founder must check.
+            $table->enum('approval_opt',['first','check']);
 
             $table->timestamps();
 
             $table->foreign('meeting_id')
-                ->references('_id')->on('meetings');
+                ->references('id')->on('meetings');
         });
     }
 

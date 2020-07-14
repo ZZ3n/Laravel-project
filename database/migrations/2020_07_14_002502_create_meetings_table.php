@@ -14,29 +14,29 @@ class CreateMeetingsTable extends Migration
     public function up()
     {
         Schema::create('meetings', function (Blueprint $table) {
-            $table->increments('_id');
-            $table->char('name',20)
+            $table->increments('id');
+            $table->char('name',50)
                 ->nullable(false);
-            $table->char('founder',20)->nullable(false);
-            $table->integer('views')
-                ->default(0)->unsigned();
-            $table->text('contents')
-                ->nullable(false);
-            $table->timestamps();
-            $table->foreign('founder')->references('id')->on('users');
-        });
-    }
+            $table->char('founder_id',50)->nullable(false);
+        $table->integer('views')
+            ->default(0)->unsigned();
+        $table->text('content')
+            ->nullable(false);
+        $table->timestamps();
+        $table->foreign('founder_id')->references('id')->on('users');
+    });
+}
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
-        Schema::table('meetings',function (Blueprint $table) {
-        $table->dropForeign('meetings_founder_foreign');
-        });
-        Schema::dropIfExists('meetings');
+/**
+ * Reverse the migrations.
+ *
+ * @return void
+ */
+public function down()
+{
+    Schema::table('meetings',function (Blueprint $table) {
+        $table->dropForeign('meetings_founder_id_foreign');
+    });
+    Schema::dropIfExists('meetings');
     }
 }
