@@ -11,17 +11,23 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/register','AuthController@register')->name('register');
+Route::post('/register', 'AuthController@tryRegister')->name('tryRegister');
+
+Route::get('/login', 'AuthController@login')->name('login');
+Route::post('/login', 'AuthController@tryLogin')->name('tryLogin');
+
+Route::permanentRedirect('/', '/home');
+Route::get('/home', 'HomeController@home')->name('home');
+
+//delete 요청으로 바꿀까?
+Route::post('/logout', 'AuthController@logout')->name('logout');
+
+
+Route::prefix('meetings')->group( function() {
+    Route::get('create', 'MeetingController@createMeeting')->name('createMeeting');
+    Route::post('create','MeetingController@tryCreateMeeting')->name('tryCreateMeeting');
+    Route::get('', 'MeetingController@meetings')->name('meetings');
 });
 
-Route::get('hello/html', function () {
-    return View::make('hello.html');
-});
 
-Route::get('task/view', function () {
-    $task = ['name' => 'task 1', 'due_date' => '20200713'];
-    return view('task.view')
-        ->with('task',$task);
-
-});

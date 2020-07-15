@@ -29,6 +29,8 @@ class CreateGroupsTable extends Migration
             // first = first come first serve, check = founder must check.
             $table->enum('approval_opt',['first','check']);
 
+            $table->char('name',200);
+
             $table->timestamps();
 
             $table->foreign('meeting_id')

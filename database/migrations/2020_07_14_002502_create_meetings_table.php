@@ -17,7 +17,7 @@ class CreateMeetingsTable extends Migration
             $table->increments('id');
             $table->char('name',50)
                 ->nullable(false);
-            $table->char('founder_id',50)->nullable(false);
+            $table->integer('founder_id',false,true)->nullable(false);
         $table->integer('views')
             ->default(0)->unsigned();
         $table->text('content')
