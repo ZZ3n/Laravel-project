@@ -13,23 +13,20 @@ class AuthController extends Controller {
     }
 
     public function tryRegister(Request $request) {
-//       $validator = $request->validate([
-//            'username' => 'bail | required | unique:users,username',
-//            'email' => 'bail | required | unique:users,email',
-//            'name' => 'required',
-//            'password' => 'required | confirmed',
-//            'password_confirmation' => 'required'
-//        ]);
+       $validator = $request->validate([
+            'username' => ['bail','required','unique:users,username','max:30'],
+            'email' => ['bail','required','unique:users,email','email'],
+            'name' => ['required','max:30'],
+            'password' => ['required','confirmed'],
+            'password_confirmation' => ['required'],
+       ]);
+
         $user = new User;
         $user->name = $request->name;
         $user->username = $request->username;
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
-        ddd($request->password,$user->password);
-        if ( ! Hash::check($request->password_confirmation,$user->password )) {
-            // 알림 구현해야 함.
-            return back();
-        }
+
         $user->save();
         return redirect('/login');
     }
@@ -40,26 +37,23 @@ class AuthController extends Controller {
 
 
     public function tryLogin(Request $request) {
-        $request->password = Hash::make($request->password);
+        $validator = $request->validate([
+            'username' => ['bail','required','exists:users,username'],
+            'password' => ['required'],
+        ]);
         $user = User::where('username',$request->username)->get()->first();
 
-//        $validator = $request->validate([
-//            'username' => 'same:username',
-////                'bail | required | exists:users,username',
-//            'password' => 'same:'.$user->password,
-//        ]);
-
-        ddd($request->password,$user->password);
-        if ($request->password == $user->password) { // login success! // 두번 체크하는 것임. 교체 필요.
-            $request->session()->put([
-                'is_login' => true,
-                'uid' => $user->id,
-                'username' => $user->username,
-            ]);
-
-            return redirect('/home');
+        if (!Hash::check($request->password,$user->password)) { // login success!
+            return back()->with('loginError','패스워드가 일치하지 않습니다.');
         }
-        return redirect('/login');
+
+        $request->session()->put([
+            'is_login' => true,
+            'uid' => $user->id,
+            'username' => $user->username,
+        ]);
+
+        return redirect('/home');
     }
 
     public function logout(Request $request) {

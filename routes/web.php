@@ -28,6 +28,7 @@ Route::prefix('meetings')->group( function() {
     Route::get('create', 'MeetingController@createMeeting')->name('createMeeting');
     Route::post('create','MeetingController@tryCreateMeeting')->name('tryCreateMeeting');
     Route::get('', 'MeetingController@meetings')->name('meetings');
+    Route::post('ajaxGroup','MeetingController@tryCreateGroup');
 });
 
 

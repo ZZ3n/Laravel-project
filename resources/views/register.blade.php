@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>Resister</title>
+    <title>Register</title>
     <style>
     </style>
 </head>

@@ -6,5 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Application extends Model
 {
-    protected $keyType = 'string';
+    protected $casts = [
+      'approval' => 'boolean',
+        'user_id' => 'integer',
+        'group_id' => 'integer',
+    ];
 }

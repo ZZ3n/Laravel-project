@@ -1,6 +1,7 @@
 
-<nav id ="on-top" style="height: 100px; margin: 0px 0px; text-align: center; display: grid;
-            grid-template-columns: 9fr 1fr 1fr 1fr;">
+<nav id ="on-top" style="
+    height: 100px; margin: 0px -10px; text-align: center; display: grid;
+    grid-template-columns: 9fr 1fr 1fr 1fr; border-bottom: solid 3px black">
     <a href="{{route('home')}}"><h1>OffOn</h1></a>
     <a href="{{route('createMeeting')}}">
        모임 개설
@@ -14,5 +15,4 @@
             <input type="submit" value="로그아웃">
         </form>
     @endif
-
 </nav>

@@ -4,8 +4,10 @@
     {{--에러 메시지 커스텀 하기 !--}}
     @if ($errors->has('username'))
         ID가 존재하지 않습니다.
-    @elseif ($errors->has('password'))
-        비밀번호가 맞지 않습니다.
+    @endif
+    {{--패스워드는 Validator 에서 체크하지 않기 때문에 session으로 오류를 보냄. --}}
+    @if(session()->has('loginError'))
+        {{session()->get('loginError')}}
     @endif
     <form method="post" action={{route('login')}}>
         @csrf
@@ -15,6 +17,8 @@
         <div><input type="password" name="password"></div>
         <br>
         <input type="submit" value="Login">
-        <input type="submit" value="Register" formmethod="GET" formaction="{{route('register')}}">
     </form>
+    <a href="{{route('register')}}">
+        <button>Register</button>
+    </a>
 </div>
