@@ -32,6 +32,7 @@
 
     <h3>그룹 설정</h3>
     <div id="groups">
+        <ul id="group_list"></ul>
         <div class="group">
             <div>
                 이름 <input type="text" name="group_name">
@@ -74,9 +75,11 @@
 <br><br>
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script>
-    $(document).ready(function() {
-
+    $(document).ready(function() { // 머임?
     });
+    @if(session()->has('message'))
+    console.log({{session()->get('message')}})
+    @endif
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
@@ -87,15 +90,34 @@
             e.preventDefault();
 
             var name = $('input[name="group_name"]').val();
+            var capacity = $('input[name="capacity"]').val();
+            var apply_start_date = $('input[name="apply_start_date"]').val();
+            var apply_end_date = $('input[name="apply_end_date"]').val();
+            var action_start_date = $('input[name="action_start_date"]').val();
+            var action_end_date = $('input[name="action_end_date"]').val();
+            var apv_opt = $('select[name="apv_opt"]').val();
+
+
 
             $.ajax({
                 type: 'POST',
                 url: 'ajaxGroup',
-                data: {name: name},
+                data: {
+                    name: name,
+                    capacity:capacity,
+                    apply_start_date:apply_start_date,
+                    apply_end_date:apply_end_date,
+                    action_start_date:action_start_date,
+                    action_end_date:action_end_date,
+                    apv_opt:apv_opt
+                },
                 success: function (data) {
-                    alert(data.success);
+                    alert(data.groups);
                     console.log(data);
-                }
+
+                    $('ul[id="group_list"]').html('<li>' + data.groups + '</li>');
+                },
+                fail
             });
         })
 
