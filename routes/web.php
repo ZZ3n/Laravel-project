@@ -11,7 +11,7 @@
 |
 */
 
-Route::get('/register','AuthController@register')->name('register');
+Route::get('/register', 'AuthController@register')->name('register');
 Route::post('/register', 'AuthController@tryRegister')->name('tryRegister');
 
 Route::get('/login', 'AuthController@login')->name('login');
@@ -24,11 +24,15 @@ Route::get('/home', 'HomeController@home')->name('home');
 Route::post('/logout', 'AuthController@logout')->name('logout');
 
 
-Route::prefix('meetings')->group( function() {
-    Route::get('create', 'MeetingController@createMeeting')->name('createMeeting');
-    Route::post('create','MeetingController@tryCreateMeeting')->name('tryCreateMeeting');
+Route::prefix('meetings')->group(function () {
     Route::get('', 'MeetingController@meetings')->name('meetings');
-    Route::post('ajaxGroup','MeetingController@tryCreateGroup');
+
+    Route::get('create', 'MeetingController@createMeeting')->name('createMeeting');
+    Route::post('create', 'MeetingController@tryCreateMeeting')->name('tryCreateMeeting');
+    Route::post('ajaxGroup', 'MeetingController@tryCreateGroup');
+
+    Route::get('detail/{meetingId?}','MeetingController@detail');
+    Route::get('detail/{meetingId?}/{groupId?}','MeetingController@apply');
 });
 
 

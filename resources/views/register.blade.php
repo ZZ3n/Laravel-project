@@ -10,6 +10,7 @@
 @endtopNav
 <h1>Register</h1>
 <div id="wrapper">
+
         @if ($errors->any())
         {{--{{ddd($errors)}}--}}
         <ul>
@@ -32,9 +33,9 @@
         <br>
         <input type="submit" value="생성">
     </form>
+
 </div>
 
 </body>
-
 </html>
 

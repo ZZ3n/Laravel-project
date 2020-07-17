@@ -6,90 +6,113 @@
         h3 {
             border-bottom: dashed 2px black;
         }
-
         body {
             margin: 0px 20px;
         }
-
         .group {
-            border: solid 1px red;
+            display: grid;
+            grid-template-columns: 2fr 5fr;
+            width: 300px;
+        }
+        .group * {
+            margin: 5px 5px;
         }
     </style>
-
+    <script src="https://cdn.ckeditor.com/4.14.1/standard/ckeditor.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 </head>
 <body>
 @topNav
 @endtopNav
-<form method="POST" action="{{route('tryCreateMeeting')}}">
+
+<form id="meeting_form" method="POST" action="{{route('tryCreateMeeting')}}">
     @csrf
     <h3>모임 정보</h3>
     <div>제목</div>
     <div><input type="text" name="name"></div>
 
     <div>내용</div>
-    <div><textarea cols="70" rows="20" name="meeting_content">상세 정보를 입력하세요.</textarea></div>
+    <div>
+        <textarea name="meeting_content"></textarea>
+        {{--<textarea cols="70" rows="20" name="meeting_content">상세 정보를 입력하세요.</textarea></div>--}}
     <br>
-
-    <h3>그룹 설정</h3>
+</form>
+{{--아래는 그룹--}}
+<h3>그룹 설정</h3>
+<div id="group_section">
     <div id="groups">
-        <ul id="group_list"></ul>
         <div class="group">
             <div>
-                이름 <input type="text" name="group_name">
+                이름
+            </div>
+            <input type="text" name="group_name">
+
+            <div>
+                정원
+            </div>
+            <input type="number" name="capacity" max="999" min="1" value="1">
+
+            <div>
+                신청 기간
             </div>
             <div>
-                정원 <input type="number" name="capacity" max="999" min="1" value="1">
-            </div>
-            <div>
-                신청 기간 <input type="datetime-local" name="apply_start_date"> ~
+                <input type="datetime-local" name="apply_start_date"> ~
                 <input type="datetime-local" name="apply_end_date">
             </div>
             <div>
                 활동 기간
+            </div>
+            <div>
                 <input type="datetime-local" name="action_start_date"> ~
                 <input type="datetime-local" name="action_end_date">
             </div>
             <div>
                 승인 방식
-                <select name="apv_opt">
-                    <option value="first">선착순</option>
-                    <option value="check">승인</option>
-                </select>
             </div>
+            <select name="apv_opt">
+                <option value="first">선착순</option>
+                <option value="check">승인</option>
+            </select>
         </div>
+        <button class="save">save</button>
     </div>
-</form>
+    <ul id="group_list"></ul>
+</div>
+<br>
+<input id="submitBtn" type="submit" value="생성">
 
-<button class="save">save</button>
-
+<ul id="errors">
     @if ($errors->any())
-        <ul><h3>Error</h3>
-            @foreach($errors->all() as $errorMessage)
-                <li>{{$errorMessage}}</li>
-            @endforeach
-        </ul>
+        <h3>Error</h3>
+        @foreach($errors->all() as $errorMessage)
+            <li>{{$errorMessage}}</li>
+        @endforeach
+
     @endif
+</ul>
+<br>
+<br>
 
-    <br><input type="submit" value="생성">
-
-<br><br>
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script>
-    $(document).ready(function() { // 머임?
-    });
-    @if(session()->has('message'))
-    console.log({{session()->get('message')}})
-    @endif
+    CKEDITOR.replace( 'meeting_content' );
+</script>
+<script type="text/javascript">
+    var submitBtn = $('input[id="submitBtn"]');
+    submitBtn.on('click', function (e) {
+        var meeting_form = document.getElementById('meeting_form');
+        meeting_form.submit();
+    })
+
+    $(document).ready(function () { // 머임?
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
             }
         });
-
         $(".save").click(function (e) {
             e.preventDefault();
 
-            var name = $('input[name="group_name"]').val();
+            var group_name = $('input[name="group_name"]').val();
             var capacity = $('input[name="capacity"]').val();
             var apply_start_date = $('input[name="apply_start_date"]').val();
             var apply_end_date = $('input[name="apply_end_date"]').val();
@@ -97,29 +120,38 @@
             var action_end_date = $('input[name="action_end_date"]').val();
             var apv_opt = $('select[name="apv_opt"]').val();
 
-
+            var error_list = $('ul[id="errors"]');
 
             $.ajax({
-                type: 'POST',
-                url: 'ajaxGroup',
-                data: {
-                    name: name,
-                    capacity:capacity,
-                    apply_start_date:apply_start_date,
-                    apply_end_date:apply_end_date,
-                    action_start_date:action_start_date,
-                    action_end_date:action_end_date,
-                    apv_opt:apv_opt
-                },
-                success: function (data) {
-                    alert(data.groups);
-                    console.log(data);
-
-                    $('ul[id="group_list"]').html('<li>' + data.groups + '</li>');
-                },
-                fail
-            });
+                        type: 'POST',
+                        url: 'ajaxGroup',
+                        data: {
+                            group_name: group_name,
+                            capacity: capacity,
+                            apply_start_date: apply_start_date,
+                            apply_end_date: apply_end_date,
+                            action_start_date: action_start_date,
+                            action_end_date: action_end_date,
+                            apv_opt: apv_opt
+                        }
+                    })
+                    .done(function (data, textStatus, xhr) {
+                        alert('저장되었습니다.');
+                                {{--data는 group이라는 키 - json으로 parse할 수 있는 string을 가짐.--}}
+                        var saved_group_name = JSON.parse(data.group).group_name;
+                        $('ul[id="group_list"]').append('<li>' + saved_group_name + '</li>');
+                    })
+                    .fail(function (data, textStatus, xhr) {
+                        for (var error in data.responseJSON['errors']) {
+                            var errorChild = document.createElement('li');
+                            errorChild.textContent = data.responseJSON['errors'][error];
+                            error_list.append(errorChild);
+                        }
+                    });
         })
+
+    });
+
 
 </script>
 </body>
