@@ -11,4 +11,14 @@ class Group extends Model
         'capacity' => 'integer',
         'name' => 'string',
     ];
+
+    public function meeting() {
+        return $this->belongsTo('App\User','meetings_id');
+    }
+
+    public function applications() {
+        //application을 소유하고 있음.
+        return $this->hasMany('App\Application');
+    }
+
 }

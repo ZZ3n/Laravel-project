@@ -22,9 +22,9 @@ class CreateApplicationsTable extends Migration
             $table->boolean('approval')
                 ->nullable(false)->default(false);
             $table->foreign('user_id')
-                ->references('id')->on('users');
+                ->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('group_id')
-                ->references('id')->on('groups');
+                ->references('id')->on('groups')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });
     }

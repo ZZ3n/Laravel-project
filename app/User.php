@@ -23,4 +23,14 @@ class User extends Authenticatable
         'name' => 'string',
     ];
 
+    public function meetings() {
+        //미팅을 소유하고 있음.
+        return $this->hasMany('App\Meeting');
+    }
+
+    public function applications() {
+        //application을 소유하고 있음.
+        return $this->hasMany('App\Application');
+    }
+
 }

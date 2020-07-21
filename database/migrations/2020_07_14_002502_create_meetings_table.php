@@ -23,7 +23,8 @@ class CreateMeetingsTable extends Migration
         $table->text('content')
             ->nullable(false);
         $table->timestamps();
-        $table->foreign('founder_id')->references('id')->on('users');
+        $table->foreign('founder_id')->references('id')
+            ->on('users')->onDelete('cascade')->onUpdate('cascade');
     });
 }
 

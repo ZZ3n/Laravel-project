@@ -6,14 +6,17 @@
         h3 {
             border-bottom: dashed 2px black;
         }
+
         body {
             margin: 0px 20px;
         }
+
         .group {
             display: grid;
             grid-template-columns: 2fr 5fr;
             width: 300px;
         }
+
         .group * {
             margin: 5px 5px;
         }
@@ -34,7 +37,8 @@
     <div>내용</div>
     <div>
         <textarea name="meeting_content"></textarea>
-        {{--<textarea cols="70" rows="20" name="meeting_content">상세 정보를 입력하세요.</textarea></div>--}}
+        {{--<textarea cols="70" rows="20" name="meeting_content">상세 정보를 입력하세요.</textarea>--}}
+    </div>
     <br>
 </form>
 {{--아래는 그룹--}}
@@ -76,7 +80,8 @@
         </div>
         <button class="save">save</button>
     </div>
-    <ul id="group_list"></ul>
+    <ul id="group_list">
+    </ul>
 </div>
 <br>
 <input id="submitBtn" type="submit" value="생성">
@@ -87,14 +92,13 @@
         @foreach($errors->all() as $errorMessage)
             <li>{{$errorMessage}}</li>
         @endforeach
-
     @endif
 </ul>
 <br>
 <br>
 
 <script>
-    CKEDITOR.replace( 'meeting_content' );
+    CKEDITOR.replace('meeting_content');
 </script>
 <script type="text/javascript">
     var submitBtn = $('input[id="submitBtn"]');
@@ -151,8 +155,6 @@
         })
 
     });
-
-
 </script>
 </body>
 </html>

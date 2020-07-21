@@ -34,7 +34,7 @@ class CreateGroupsTable extends Migration
             $table->timestamps();
 
             $table->foreign('meeting_id')
-                ->references('id')->on('meetings');
+                ->references('id')->on('meetings')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 

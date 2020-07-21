@@ -31,7 +31,7 @@ class AuthController extends Controller {
         return redirect('/login');
     }
 
-    public function login() {
+    public function login(Request $request) {
         return view('login');
     }
 
@@ -41,7 +41,7 @@ class AuthController extends Controller {
             'username' => ['bail','required','exists:users,username'],
             'password' => ['required'],
         ]);
-        $user = User::where('username',$request->username)->get()->first();
+        $user = User::where('username',$request->username)->first();
 
         if (!Hash::check($request->password,$user->password)) { // login success!
             return back()->with('loginError','패스워드가 일치하지 않습니다.');
@@ -52,12 +52,11 @@ class AuthController extends Controller {
             'uid' => $user->id,
             'username' => $user->username,
         ]);
-
         return redirect('/home');
     }
 
     public function logout(Request $request) {
-        $request->session()->forget(['is_login','uid']);
+        $request->session()->forget(['is_login','uid','username']);
         return redirect('/home');
     }
 }

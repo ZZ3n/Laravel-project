@@ -76,7 +76,7 @@
             <div>{{$group->apply_end_date}}</div>
             <div>{{$group->act_start_date}}</div>
             <div>{{$group->act_end_date}}</div>
-            <div>정원 : {{$group->capacity}}</div>
+            <div>정원 : {{$group->applications_count}}/{{$group->capacity}}</div>
             {{--승인 방식 한글로 바꿔야 함.--}}
             <div>승인방식 : {{$group->approval_opt}}</div>
             <br>

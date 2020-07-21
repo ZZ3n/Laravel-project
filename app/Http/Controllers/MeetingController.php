@@ -2,24 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use App\Application;
 use App\Meeting;
-use Illuminate\Http\Request;
 use App\User;
 use App\Group;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class MeetingController extends Controller
 {
+
     public function meetings(Request $request)
     {
-        // 모임의 데이터를 배열로 만들어서 전달.
-        $meetings = DB::table('groups')
-            ->leftJoin('meetings', 'meetings.id', '=', 'groups.meeting_id')
-            ->select(DB::raw('meeting_id,max(act_end_date) as act_end_date,meetings.name,meetings.content'))
-            ->groupBy('meeting_id')
-            ->get();
-        //ddd($meetings);
+        //포함해야하는것. -> max(act_end_date),meeting_name,meeting_views,meeting_created_at
+        // 표시용 : act_end_date , meeting_name x, meeting_id x
+        // sort용 : views x,created_at x,applied user x
+        $applications = DB::table('applications')
+            ->selectRaw('count(*) as applies,group_id')
+            ->groupBy('group_id');
+
+        $groups = DB::table('groups')
+            ->selectRaw('max(act_end_date) as act_end_date,meeting_id,sum(applies) as applies')
+            ->leftJoinSub($applications,'A',function($join) {
+                $join->on('A.group_id','=','groups.id');
+            })->where('act_end_date','>=',now())
+            ->groupBy('meeting_id');
+
+        $meetings = DB::table('meetings')
+            ->selectRaw('meetings.id,meetings.content,meetings.name,meetings.views,meetings.created_at,G.act_end_date,applies')
+            ->leftJoinSub($groups,'G',function($join) {
+                $join->on('meetings.id','=','G.meeting_id');
+            })
+            ->orderBy('views','desc')
+            ->orderBy('created_at','asc')->get();
+
         return view('meetings.list', ['meetings' => $meetings]);
     }
 
@@ -49,7 +65,7 @@ class MeetingController extends Controller
 
         //세션 정보 저장하기.
         $groups = collect($request->session()->get('groups'));
-        foreach($groups as $group_string) {
+        foreach ($groups as $group_string) {
             $info = json_decode($group_string);
             $group = new Group;
             $group->name = $info->group_name;
@@ -92,21 +108,19 @@ class MeetingController extends Controller
         return response()->json(['group' => json_encode($input)]);
     }
 
-    public function detail(Request $request, $meetingId = null) {
-        if ($meetingId==null) {
+    public function detail(Request $request, $meetingId = null)
+    {
+        if ($meetingId == null) {
             return redirect('/meetings');
         }
-        $meeting = Meeting::where('id',$meetingId)->get()->first();
-        $founder = User::where('id',$meeting->founder_id)->get()->first();
-        $groups = Group::where('meeting_id',$meeting->id)->get();
-//        ddd($meeting->name,$founder->username,$meeting->content);
-//        $detail = collect([
-//            'meetingName' => $meeting->name,
-//            'meetingId' => $meeting->id,
-//            'founderName' => $founder->username,
-//            'meetingContent' => $meeting->content,
-//            'founderEmail' => $founder->email
-//        ]);
+        $meeting = Meeting::where('id', $meetingId)->get()->first();
+        if ($meeting == null) {
+            return redirect('/meetings');
+        }
+        $meeting->views = $meeting->views + 1;
+        $meeting->save();
+        $founder = User::where('id', $meeting->founder_id)->get()->first();
+        $groups = Group::where('meeting_id', $meeting->id)->withCount('applications')->get();
         return view('meetings.detail')->with([
             'meeting' => $meeting,
             'group_list' => $groups,
@@ -114,12 +128,18 @@ class MeetingController extends Controller
         ]);
     }
 
-    public function apply(Request $request, $meetingId = null, $groupId = null) {
-        $meeting = Meeting::where('id',$meetingId)->get()->first();
-        $group = Group::where('meeting_id',$meetingId)->where('id',$groupId)->get()->first();
-        $founder = User::where('id',$meeting->founder_id)->get()->first();
+    public function apply(Request $request, $meetingId = null, $groupId = null)
+    {
+        $meeting = Meeting::where('id', $meetingId)->get()->first();
+        $group = Group::where('id', $groupId)->withCount('applications')->first();
+        $founder = User::where('id', $meeting->founder_id)->get()->first();
         if ($meeting == null | $group == null) {
             return redirect('/home');
+        }
+        $already = Application::where('group_id', $groupId)->
+        where('user_id', $request->session()->get('uid'))->first();
+        if ($already != null) {
+            $request->session()->flash('already', true);
         }
         return view('meetings.apply')->with([
             'meeting' => $meeting,
@@ -127,4 +147,37 @@ class MeetingController extends Controller
             'founder' => $founder,
         ]);
     }
+
+    public function tryApplication(Request $request)
+    {
+        if (!$request->session()->has('uid')) {
+            return redirect('login');
+        }
+        if (Application::where('group_id', $request->group_id)->
+            where('user_id', $request->session()->get('uid'))->first() != null
+        ) {
+            return redirect('/home'); // 신청하셨습니다.
+        }
+        $user = User::where('id', $request->session()->get('uid'))->first();
+        $group = Group::where('id', $request->group_id)->withCount('applications')->first();
+        if ($user == null || $group == null) {
+            return redirect('/home'); // 유효하지 않은 요청입니다.
+        }
+
+        $apply = new Application;
+        $apply->user_id = $user->id;
+        $apply->group_id = $group->id;
+        $apply->reason = $request->reason;
+        if ($request->approval_opt = 'first') {
+            $apply->approval = true;
+        } else {
+            $apply->approval = false;
+        }
+
+        $apply->save();
+
+        return redirect('/meetings/detail/'.$group->meeting_id);
+//        return redirect('') 리스트 쪽으로 리다이렉팅
+    }
+
 }

@@ -12,10 +12,14 @@ text-decoration: none;color : black;">
         모임 찾기
     </a>
     </div>
-    @if (session()->get('is_login'))
+    @if (session()->get('is_login') == true)
+        <div>
         <form action="{{route('logout')}}" method="post">
+            <strong>{{session()->get('username')}}</strong> 님 <br><br>
             @csrf
             <input type="submit" value="로그아웃">
         </form>
+        <a href="/profile"><button>내 정보</button></a>
+        </div>
     @endif
 </nav>
