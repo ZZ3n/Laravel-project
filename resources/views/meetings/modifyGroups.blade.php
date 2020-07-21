@@ -24,12 +24,6 @@
             border-bottom: solid 1px black;
         }
 
-        #content {
-            border: double 5px black;
-            padding: 10px 10px;
-            background-color: whitesmoke;
-        }
-
         #founder-info {
             margin: 6px 0px 0px 10px;
             border: dashed 1px black;
@@ -53,7 +47,7 @@
 
         .applications {
             display: grid;
-            grid-template-columns: 2fr 4fr 2fr 2fr 2fr;
+            grid-template-columns: 2fr 4fr 2fr 2fr;
         }
 
         .applications * {
@@ -97,7 +91,6 @@
                 <div>사유</div>
                 <div>승인 여부</div>
                 <div></div>
-                <div></div>
                 @foreach($applications as $application)
                     @if($application->group_id == $group->id)
                         <div>{{$application->username}}</div>
@@ -107,12 +100,14 @@
                         @else
                             <div>거절됨</div>
                         @endif
-                        <div>
-                            <button>승인</button>
-                        </div>
-                        <div>
-                            <button>거절</button>
-                        </div>
+                        <form method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="username" value="{{$application->username}}">
+                            <input type="hidden" name="group_id" value="{{$group->id}}">
+                            <input type="submit" value="승인" formaction="/meetings/modify/groups/{{$meeting->id}}/accept">
+                            <input type="submit" value="거절" formaction="/meetings/modify/groups/{{$meeting->id}}/deny">
+                        </form>
                     @endif
                 @endforeach
             </div>

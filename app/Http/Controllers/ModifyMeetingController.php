@@ -7,6 +7,7 @@ use App\Group;
 use App\Meeting;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ModifyMeetingController extends Controller
 {
@@ -38,10 +39,7 @@ class ModifyMeetingController extends Controller
         }
         $meeting = Meeting::where('id',$meetingId)->first();
         $groups = Group::withCount('applications')->where('meeting_id',$meetingId)->get();
-        $temp = Group::withCount('applications')->where('meeting_id',$meetingId)
-            ->select('id')->get()->flatten();
-        $applications = Application::where('group_id',$temp->toArray())
-            ->rightJoin('users','users.id','=','applications.user_id')
+        $applications = Application::leftJoin('users','users.id','=','applications.user_id')
             ->select('users.username','applications.*')
             ->get();
         $founder = User::where('id',$meeting->founder_id)->first();
@@ -51,5 +49,19 @@ class ModifyMeetingController extends Controller
             'founder' =>$founder,
             'applications' => $applications,
         ]);
+    }
+
+    public function acceptUser(Request $request, $meetingId=null) {
+        $user = User::where('username',$request->username)->first();
+        DB::table('applications')->where('group_id',$request->group_id)
+            ->where('user_id',$user->id)->update(['approval'=>true]);
+        return back();
+    }
+
+    public function denyUser(Request $request,$meetingId = null) {
+        $user = User::where('username',$request->username)->first();
+        DB::table('applications')->where('group_id',$request->group_id)
+            ->where('user_id',$user->id)->update(['approval'=>false]);
+        return back();
     }
 }

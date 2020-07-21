@@ -44,6 +44,8 @@ Route::prefix('meetings')->group(function () {
     Route::post('modify/meeting/{meetingId?}', 'ModifyMeetingController@postMeeting');
 
     Route::get('modify/groups/{meetingId?}', 'ModifyMeetingController@getGroups');
+    Route::patch('modify/groups/{meetingId?}/accept','ModifyMeetingController@acceptUser');
+    Route::patch('modify/groups/{meetingId?}/deny','ModifyMeetingController@denyUser');
 });
 
 

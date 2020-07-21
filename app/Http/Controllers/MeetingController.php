@@ -168,14 +168,12 @@ class MeetingController extends Controller
         $apply->user_id = $user->id;
         $apply->group_id = $group->id;
         $apply->reason = $request->reason;
-        if ($request->approval_opt = 'first') {
+        if ($request->approval_opt == 'first') {
             $apply->approval = true;
         } else {
             $apply->approval = false;
         }
-
         $apply->save();
-
         return redirect('/meetings/detail/'.$group->meeting_id);
 //        return redirect('') 리스트 쪽으로 리다이렉팅
     }
