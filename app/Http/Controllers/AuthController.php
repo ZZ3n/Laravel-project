@@ -5,8 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Hash;
+use App\Repositories\UserRepository;
 
 class AuthController extends Controller {
+
+    protected $userRepository;
+
+    function __construct() {
+        $this->userRepository = new UserRepository();
+    }
 
     public function register() {
         return view('register');
@@ -20,7 +27,7 @@ class AuthController extends Controller {
             'password' => ['required','confirmed'],
             'password_confirmation' => ['required'],
        ]);
-
+        //TODO :: 서비스 레이어에서 생성하게끔 고치기!
         $user = new User;
         $user->name = $request->name;
         $user->username = $request->username;
@@ -41,9 +48,10 @@ class AuthController extends Controller {
             'username' => ['bail','required','exists:users,username'],
             'password' => ['required'],
         ]);
-        $user = User::where('username',$request->username)->first();
 
-        if (!Hash::check($request->password,$user->password)) { // login success!
+        $user = $this->userRepository->findUserByUsername($request->username);
+
+        if ($this->userRepository->checkUserPassword($user->id,$request->password)) {
             return back()->with('loginError','패스워드가 일치하지 않습니다.');
         }
 
