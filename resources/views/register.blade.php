@@ -3,6 +3,10 @@
 <head>
     <title>Register</title>
     <style>
+        * {
+            text-decoration: none;
+            color: black;
+        }
     </style>
 </head>
 <body>
@@ -11,12 +15,12 @@
 <h1>Register</h1>
 <div id="wrapper">
 
-        @if ($errors->any())
+    @if ($errors->any())
         {{--{{ddd($errors)}}--}}
         <ul>
             {{$errors->first()}}
         </ul>
-        @endif
+    @endif
 
     <form method="post" action="{{route('tryRegister')}}">
         @csrf

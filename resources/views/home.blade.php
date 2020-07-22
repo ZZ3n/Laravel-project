@@ -10,9 +10,8 @@
         }
 
         #main {
-
             display: grid;
-            grid-template-columns: 2fr 2fr 2fr 2fr 2fr;
+            grid-template-columns: 2fr 2fr 2fr;
         }
 
         .meeting-card {
@@ -28,6 +27,13 @@
             border: dashed 1px black;
             padding: 10px;
             margin-right: 20px;
+            height: 190px;
+            margin-top: 10px;
+        }
+
+        * {
+            text-decoration: none;
+            color: black;
         }
     </style>
 </head>
@@ -59,7 +65,9 @@
                         <h3>{{session()->get('username')}}님 환영합니다.</h3>
                         <input type="submit" value="Logout" formmethod="post" formaction="{{route('logout')}}">
                     </form>
-                    <a href="/profile"><button>내 정보</button></a>
+                    <a href="/profile">
+                        <button>내 정보</button>
+                    </a>
                 </div>
 
             @else

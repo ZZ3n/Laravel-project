@@ -10,14 +10,16 @@
 
         .card {
             height: 100px;
-            min-width: 200px;
-            word-break: break-all;
+            width: 200px;
             margin: 10px 10px;
             padding: 5px 5px;
             border: solid 1px black;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        a {
+        * {
             text-decoration: none;
             color: black;
         }
@@ -30,6 +32,13 @@
 
         h2 {
             border-bottom: solid 1px black;
+        }
+
+        .name {
+            display: inline-block;
+            font-size: 20px;
+            font-weight: 800;
+            height: 60px;
         }
     </style>
 </head>
@@ -55,11 +64,15 @@
         <div class="card">
             <div>
                 <a href="{{route('meetings').'/detail/'.$meeting->id}}">
-                    <h3>{{\Illuminate\Support\Str::limit($meeting->name,40)}}</h3>
+                    <div class="name">{{$meeting->name,40}}</div>
                 </a>
             </div>
-            <a href="/meetings/modify/meeting/{{$meeting->id}}"><button>수정하기</button></a>
-            <a href="/meetings/modify/groups/{{$meeting->id}}"><button>참가자 관리</button></a>
+            <a href="/meetings/modify/meeting/{{$meeting->id}}">
+                <button>수정하기</button>
+            </a>
+            <a href="/meetings/modify/groups/{{$meeting->id}}">
+                <button>참가자 관리</button>
+            </a>
         </div>
     @endforeach
 </div>
@@ -71,7 +84,7 @@
     @foreach($user_apps as $user_app)
         <a href="{{route('meetings').'/detail/'.$user_app->meeting_id}}">
             <div class="card">
-                <h4>{{\Illuminate\Support\Str::limit($user_app->name,30)}}</h4>
+                <div class="name">{{$user_app->name}}</div>
                 그룹 이름: {{$user_app->group_name}}<br>
                 승인 여부: {{$user_app->approval}}
             </div>

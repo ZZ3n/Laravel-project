@@ -2,7 +2,10 @@
 <head>
     <title>Login</title>
     <style>
-
+        * {
+            text-decoration: none;
+            color: black;
+        }
     </style>
 </head>
 <body>

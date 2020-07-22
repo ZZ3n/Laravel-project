@@ -27,10 +27,16 @@
             margin: 6px 0px 0px 10px;
             border: dashed 1px black;
         }
+
         #group {
-            display:grid;
+            display: grid;
             grid-template-columns: 2fr 6fr;;
-            border:4px double black;
+            border: 4px double black;
+        }
+
+        * {
+            text-decoration: none;
+            color: black;
         }
 
     </style>
@@ -51,7 +57,7 @@
         </div>
     </div>
 </div>
-<div id ="group">
+<div id="group">
     <div>그룹 이름</div>
     <div>{{$group->name}}</div>
     <div>신청 가능 날짜</div>
@@ -67,25 +73,25 @@
 </div>
 <br>
 @if (session()->get('is_login') == true)
-<form action="" method="post">
-    @csrf
-    사유 :
-    <input type="text" name="reason" id="reason" maxlength="200">
-    <input type="hidden" name="group_id" value="{{$group->id}}">
-    <input type="hidden" name="approval_opt" value="{{$group->approval_opt}}">
-    <br><br>
-    <input type="submit" value="신청 하기">
-</form>
+    <form action="" method="post">
+        @csrf
+        사유 :
+        <input type="text" name="reason" id="reason" maxlength="200">
+        <input type="hidden" name="group_id" value="{{$group->id}}">
+        <input type="hidden" name="approval_opt" value="{{$group->approval_opt}}">
+        <br><br>
+        <input type="submit" value="신청 하기">
+    </form>
 @else
     신청하시려면 지금
     <a href="{{route('login')}}">
-    <button>로그인 하기</button>
+        <button>로그인 하기</button>
     </a>
 @endif
 <script>
     @if (session()->has('already'))
         alert('이미 신청하셨습니다.');
-        window.history.back();
+    window.history.back();
     @endif
 </script>
 </body>

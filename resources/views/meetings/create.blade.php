@@ -20,6 +20,11 @@
         .group * {
             margin: 5px 5px;
         }
+
+        * {
+            text-decoration: none;
+            color: black;
+        }
     </style>
     <script src="https://cdn.ckeditor.com/4.14.1/standard/ckeditor.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>

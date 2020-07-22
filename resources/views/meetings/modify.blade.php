@@ -10,6 +10,11 @@
         body {
             margin: 0px 20px;
         }
+
+        * {
+            text-decoration: none;
+            color: black;
+        }
     </style>
     <script src="https://cdn.ckeditor.com/4.14.1/standard/ckeditor.js"></script>
 </head>
@@ -24,7 +29,7 @@
     <div><input type="text" name="name" value="{{$meeting->name}}"></div>
     <div>내용</div>
     <div>
-        <textarea name="meeting_content" >{{$meeting->content}}</textarea>
+        <textarea name="meeting_content">{{$meeting->content}}</textarea>
     </div>
     <br>
     <input type="submit" value="수정 완료">

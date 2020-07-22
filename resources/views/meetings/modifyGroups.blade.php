@@ -53,6 +53,11 @@
         .applications * {
             border: dashed 1px black;
         }
+
+        * {
+            text-decoration: none;
+            color: black;
+        }
     </style>
 </head>
 <body>
@@ -105,7 +110,8 @@
                             @method('PATCH')
                             <input type="hidden" name="username" value="{{$application->username}}">
                             <input type="hidden" name="group_id" value="{{$group->id}}">
-                            <input type="submit" value="승인" formaction="/meetings/modify/groups/{{$meeting->id}}/accept">
+                            <input type="submit" value="승인"
+                                   formaction="/meetings/modify/groups/{{$meeting->id}}/accept">
                             <input type="submit" value="거절" formaction="/meetings/modify/groups/{{$meeting->id}}/deny">
                         </form>
                     @endif

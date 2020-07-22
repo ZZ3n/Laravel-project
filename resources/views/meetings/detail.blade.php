@@ -19,9 +19,11 @@
         #meeting-info div {
             margin: 15px 10px;
         }
+
         .underline {
             border-bottom: solid 1px black;
         }
+
         #content {
             border: double 5px black;
             padding: 10px 10px;
@@ -44,6 +46,11 @@
             grid-template-columns: 2fr 2fr;
             border: solid 1px black;
             margin: 5px 5px;
+        }
+
+        * {
+            text-decoration: none;
+            color: black;
         }
     </style>
 </head>

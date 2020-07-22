@@ -8,19 +8,24 @@
             grid-template-columns: 2fr 2fr 2fr 2fr 2fr;
         }
 
-        #meetings .meeting-card {
-            margin: 10px 10px;
-            padding: 5px 5px;
-            border: solid 1px black;
-        }
-
         .meeting-card {
+            margin: 10px 10px;
+            padding: 15px 5px 5px 5px;
+            border: solid 1px black;
             height: 200px;
-            min-width: 200px;
-            word-break: break-all;
+            width: 200px;
         }
 
-        a {
+        .meeting-card div {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        h3 {
+            height: 100px;
+        }
+
+        * {
             text-decoration: none;
             color: black;
         }
@@ -32,15 +37,15 @@
 @endtopNav
 <div id="meetings">
     @foreach($meetings as $meeting)
-        <div class="meeting-card">
-            <a href="{{route('meetings').'/detail/'.$meeting->id}}">
+        <a href="{{route('meetings').'/detail/'.$meeting->id}}">
+            <div class="meeting-card">
+                <div><h3>{{$meeting->name,20}}</h3></div>
+                <br>
                 <div>
-                    <h3>{{\Illuminate\Support\Str::limit($meeting->name,20)}}</h3>
-                    <br>
                     {{$meeting->act_end_date}}
                 </div>
-            </a>
-        </div>
+            </div>
+        </a>
     @endforeach
 </div>
 </body>
