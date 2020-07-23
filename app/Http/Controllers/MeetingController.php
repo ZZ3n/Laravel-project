@@ -17,24 +17,28 @@ class MeetingController extends Controller
         //포함해야하는것. -> max(act_end_date),meeting_name,meeting_views,meeting_created_at
         // 표시용 : act_end_date , meeting_name x, meeting_id x
         // sort용 : views x,created_at x,applied user x
-        $applications = DB::table('applications')
-            ->selectRaw('count(*) as applies,group_id')
-            ->groupBy('group_id');
+        $meetings = DB::transaction( function() {
+            $applications = DB::table('applications')
+                ->selectRaw('count(*) as applies,group_id')
+                ->groupBy('group_id');
 
-        $groups = DB::table('groups')
-            ->selectRaw('max(act_end_date) as act_end_date,meeting_id,sum(applies) as applies')
-            ->leftJoinSub($applications,'A',function($join) {
-                $join->on('A.group_id','=','groups.id');
-            })->where('act_end_date','>=',now())
-            ->groupBy('meeting_id');
+            $groups = DB::table('groups')
+                ->selectRaw('max(act_end_date) as act_end_date,meeting_id,sum(applies) as applies')
+                ->leftJoinSub($applications,'A',function($join) {
+                    $join->on('A.group_id','=','groups.id');
+                })->where('act_end_date','>=',now())
+                ->groupBy('meeting_id');
 
-        $meetings = DB::table('meetings')
-            ->selectRaw('meetings.id,meetings.content,meetings.name,meetings.views,meetings.created_at,G.act_end_date,applies')
-            ->leftJoinSub($groups,'G',function($join) {
-                $join->on('meetings.id','=','G.meeting_id');
-            })
-            ->orderBy('views','desc')
-            ->orderBy('created_at','asc')->get();
+            $meetings = DB::table('meetings')
+                ->selectRaw('meetings.id,meetings.content,meetings.name,meetings.views,meetings.created_at,G.act_end_date,applies')
+                ->leftJoinSub($groups,'G',function($join) {
+                    $join->on('meetings.id','=','G.meeting_id');
+                })
+                ->orderBy('views','desc')
+                ->orderBy('created_at','asc')->get();
+            return $meetings;
+        }, 5);
+
 
         return view('meetings.list', ['meetings' => $meetings]);
     }
