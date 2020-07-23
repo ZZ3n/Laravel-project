@@ -9,9 +9,13 @@ use App\Group;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+/*
+ * 모임 전반을 관리하는 컨트롤러
+ */
 class MeetingController extends Controller
 {
 
+    // meeting list를 만드는 컨트롤러
     public function meetings(Request $request)
     {
         //포함해야하는것. -> max(act_end_date),meeting_name,meeting_views,meeting_created_at
@@ -42,7 +46,7 @@ class MeetingController extends Controller
 
         return view('meetings.list', ['meetings' => $meetings]);
     }
-
+    // meeting 생성 get 요청을 받는 컨트롤러
     public function createMeeting(Request $request)
     {
         $request->session()->forget('groups');
@@ -53,13 +57,18 @@ class MeetingController extends Controller
         }
         return view('meetings.create');
     }
-
+    // meeting 생성 post 요청을 받는 컨트롤러 (meeting 생성)
     public function tryCreateMeeting(Request $request)
     {
         $request->validate([
             'name' => ['required'],
             'meeting_content' => ['required'],
         ]);
+        //세션 정보 저장하기.
+        $groups = collect($request->session()->get('groups'));
+        if ($groups->isEmpty()) {
+            return back()->with(['groupError' => '그룹을 먼저 생성해주세요.']);
+        }
 
         $meeting = new Meeting;
         $meeting->name = $request->name;
@@ -67,8 +76,6 @@ class MeetingController extends Controller
         $meeting->content = $request->meeting_content;
         $meeting->save();
 
-        //세션 정보 저장하기.
-        $groups = collect($request->session()->get('groups'));
         foreach ($groups as $group_string) {
             $info = json_decode($group_string);
             $group = new Group;
@@ -90,7 +97,7 @@ class MeetingController extends Controller
         }
         return redirect('/home');
     }
-
+    // meeting 생성 페이지에서 Ajax 요청을 받는 컨트롤러
     public function tryCreateGroup(Request $request)
     {
 
@@ -111,7 +118,7 @@ class MeetingController extends Controller
         $request->session()->push('groups', json_encode($input));
         return response()->json(['group' => json_encode($input)]);
     }
-
+    //meeting 상세 보기 페이지
     public function detail(Request $request, $meetingId = null)
     {
         if ($meetingId == null) {
@@ -131,7 +138,7 @@ class MeetingController extends Controller
             'founder' => $founder
         ]);
     }
-
+    // meeting 지원 페이지를 만드는 컨트롤러
     public function apply(Request $request, $meetingId = null, $groupId = null)
     {
         $meeting = Meeting::where('id', $meetingId)->get()->first();
@@ -151,7 +158,7 @@ class MeetingController extends Controller
             'founder' => $founder,
         ]);
     }
-
+    // meeting 지원 post요청을 받는 컨트롤러.
     public function tryApplication(Request $request)
     {
         if (!$request->session()->has('uid')) {

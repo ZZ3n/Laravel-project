@@ -25,6 +25,16 @@
             text-decoration: none;
             color: black;
         }
+
+        #groups {
+            display: grid;
+            grid-template-columns: 2fr 2fr;
+            border-bottom: dashed 2px black;
+        }
+
+        #group_list {
+            border-left: dashed 1px black;
+        }
     </style>
     <script src="https://cdn.ckeditor.com/4.14.1/standard/ckeditor.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
@@ -42,11 +52,9 @@
     <div>내용</div>
     <div>
         <textarea name="meeting_content"></textarea>
-        {{--<textarea cols="70" rows="20" name="meeting_content">상세 정보를 입력하세요.</textarea>--}}
     </div>
     <br>
 </form>
-{{--아래는 그룹--}}
 <h3>그룹 설정</h3>
 <div id="group_section">
     <div id="groups">
@@ -82,16 +90,22 @@
                 <option value="first">선착순</option>
                 <option value="check">승인</option>
             </select>
+
+            <button class="save">save</button>
         </div>
-        <button class="save">save</button>
+        <ul id="group_list">
+            <h3>생성된 그룹</h3>
+        </ul>
     </div>
-    <ul id="group_list">
-    </ul>
+
 </div>
 <br>
 <input id="submitBtn" type="submit" value="생성">
 
 <ul id="errors">
+    @if (session('groupError'))
+        <h3>{{session('groupError')}}</h3>
+    @endif
     @if ($errors->any())
         <h3>Error</h3>
         @foreach($errors->all() as $errorMessage)
@@ -112,7 +126,7 @@
         meeting_form.submit();
     })
 
-    $(document).ready(function () { // 머임?
+    $(document).ready(function () {
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('input[name="_token"]').attr('value')
