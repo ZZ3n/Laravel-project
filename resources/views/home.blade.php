@@ -48,7 +48,7 @@
             <div class="meeting-card">
                 <a href="{{route('meetings').'/detail/'.$meeting->id}}">
                     <div>
-                        <h3>{{\Illuminate\Support\Str::limit($meeting->name,20)}}</h3>
+                        <h3>{{$meeting->name}}</h3>
                         {{$meeting->act_end_date}}
                     </div>
                 </a>

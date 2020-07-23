@@ -103,10 +103,11 @@ class UserRepository implements UserRepositoryInterface
 
     public function checkUserPassword(int $id, string $password) {
         $user = $this->findUserById($id);
+
         if (!$user) {
             return false;
         }
-        if (! Hash::check($password,$user->password)) {
+        if ( !Hash::check($password,$user->password)) {
             return false;
         }
         return true;

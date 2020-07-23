@@ -51,7 +51,7 @@ class AuthController extends Controller {
 
         $user = $this->userRepository->findUserByUsername($request->username);
 
-        if ($this->userRepository->checkUserPassword($user->id,$request->password)) {
+        if (!$this->userRepository->checkUserPassword($user->id,$request->password)) {
             return back()->with('loginError','패스워드가 일치하지 않습니다.');
         }
 
