@@ -3,113 +3,39 @@
 namespace App\Repositories;
 
 use App\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Log;
-use App\UserRepositoryInterface;
 
-
-class UserRepository implements UserRepositoryInterface
+interface UserRepository
 {
-    protected $user;
+/*
+* Create New User to Data Source
+* @param New user ORM instance
+* @return User Model or false
+*/
+public function store(User $user);
 
-    function __construct() {
-        $this->user = new User;
-    }
+/*
+ *  Find User from Data Source
+     * @param user info
+     * @return user Model or False
+ */
 
-    public function registerUser(User $user)
-    {
-        $newUser = $user->save();
-        return $newUser;
-    }
+public function findByEmail(string $email);
+public function findByUsername(string $username);
+public function findById(int $id);
 
-    public function findUserByEmail(string $email) {
-        try {
-            $user = User::where('email',$email)->firstOrFail();
-        }catch (ModelNotFoundException $e) {
-            \Illuminate\Support\Facades\Log::notice('Email Not Found');
-            return false;
-        }
-        return $user;
-    }
-
-    public function findUserByUsername(string $username) {
-        try {
-            $user = User::where('username',$username)->firstOrFail();
-        }catch (ModelNotFoundException $e) {
-            Log::notice('Username Not Found');
-            return false;
-        }
-        return $user;
-    }
-
-    public function findUserById(int $id) {
-        try {
-            $user = User::where('id',$id)->firstOrFail();
-        }catch (ModelNotFoundException $e) {
-            Log::notice('ID Not Found');
-            return false;
-        }
-        return $user;
-    }
-
-    public function updateUserEmail(int $id, string $email) {
-        $user = $this->findUserById($id);
-        if (!$user) { // ID invalid
-            return false;
-        }
-        if (!$this->findUserByEmail($email)) {// email Exist
-            return false;
-        }
-        $user->email = $email;
-        $user->save();
-
-        return $user;
-    }
-
-    public function updateUserUsername(int $id, string $username) {
-        $user = $this->findUserById($id);
-        if (!$user) { // ID invalid
-            return false;
-        }
-        if (!$this->findUserByUsername($username)) { // username exist
-            return false;
-        }
-        $user->username = $username;
-        $user->save();
-
-        return $user;
-    }
-    public function updateUserPassword(int $id, string $password) {
-        $user = $this->findUserById($id);
-        if (!$user) { // ID invalid
-            return false;
-        }
-        $user->password = Hash::make($password);
-        $user->save();
-
-        return $user;
-    }
-    public function updateUserName(int $id, string $name) {
-        $user = $this->findUserById($id);
-        if (!$user) { // ID invalid
-            return false;
-        }
-        $user->name = $name;
-        $user->save();
-
-        return $user;
-    }
-
-    public function checkUserPassword(int $id, string $password) {
-        $user = $this->findUserById($id);
-
-        if (!$user) {
-            return false;
-        }
-        if ( !Hash::check($password,$user->password)) {
-            return false;
-        }
-        return true;
-    }
+/*
+* Update user from Data source
+* @param user info ( exist id , New email )
+* @return updated user Model or False
+*/
+public function updateEmail(int $id, string $email);
+public function updateUsername(int $id, string $username);
+public function updatePassword(int $id, string $password);
+public function updateName(int $id, string $name);
+/*
+ *  Check user's password
+ * @param user id, string user password
+ * @return true or false
+ */
+public function checkPassword(int $id, string $password);
 }
