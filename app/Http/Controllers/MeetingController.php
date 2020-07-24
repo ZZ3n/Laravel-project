@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Application;
 use App\Meeting;
+use App\Services\MeetingService;
+use App\Services\UserService;
 use App\User;
 use App\Group;
 use Illuminate\Http\Request;
@@ -12,8 +14,18 @@ use Illuminate\Support\Facades\DB;
 /*
  * 모임 전반을 관리하는 컨트롤러
  */
+
 class MeetingController extends Controller
 {
+
+    protected $meetingService;
+    protected $userService;
+
+    function __construct(MeetingService $meetingService, UserService $userService)
+    {
+        $this->meetingService = $meetingService;
+        $this->userService = $userService;
+    }
 
     // meeting list를 만드는 컨트롤러
     public function meetings(Request $request)
@@ -21,42 +33,44 @@ class MeetingController extends Controller
         //포함해야하는것. -> max(act_end_date),meeting_name,meeting_views,meeting_created_at
         // 표시용 : act_end_date , meeting_name x, meeting_id x
         // sort용 : views x,created_at x,applied user x
-        $meetings = DB::transaction( function() {
+        $meetings = DB::transaction(function () {
             $applications = DB::table('applications')
                 ->selectRaw('count(*) as applies,group_id')
                 ->groupBy('group_id');
 
             $groups = DB::table('groups')
                 ->selectRaw('max(act_end_date) as act_end_date,meeting_id,sum(applies) as applies')
-                ->leftJoinSub($applications,'A',function($join) {
-                    $join->on('A.group_id','=','groups.id');
-                })->where('act_end_date','>=',now())
+                ->leftJoinSub($applications, 'A', function ($join) {
+                    $join->on('A.group_id', '=', 'groups.id');
+                })->where('act_end_date', '>=', now())
                 ->groupBy('meeting_id');
 
             $meetings = DB::table('meetings')
                 ->selectRaw('meetings.id,meetings.content,meetings.name,meetings.views,meetings.created_at,G.act_end_date,applies')
-                ->leftJoinSub($groups,'G',function($join) {
-                    $join->on('meetings.id','=','G.meeting_id');
+                ->leftJoinSub($groups, 'G', function ($join) {
+                    $join->on('meetings.id', '=', 'G.meeting_id');
                 })
-                ->orderBy('views','desc')
-                ->orderBy('created_at','asc')->get();
+                ->orderBy('views', 'desc')
+                ->orderBy('created_at', 'asc')->get();
             return $meetings;
         }, 5);
 
 
         return view('meetings.list', ['meetings' => $meetings]);
     }
+
     // meeting 생성 get 요청을 받는 컨트롤러
     public function createMeeting(Request $request)
     {
         $request->session()->forget('groups');
-        $user = User::where('id', $request->session()->get('uid'))->get()->first();
+        $user = User::fromSession($request->session());
         if ($user == null) {
             //login 갔다가 다시 모임 개설 페이지로 오는 방법은?
             return redirect('/login')->with('loginAlert', '로그인이 필요한 서비스입니다.');
         }
         return view('meetings.create');
     }
+
     // meeting 생성 post 요청을 받는 컨트롤러 (meeting 생성)
     public function tryCreateMeeting(Request $request)
     {
@@ -70,10 +84,7 @@ class MeetingController extends Controller
             return back()->with(['groupError' => '그룹을 먼저 생성해주세요.']);
         }
 
-        $meeting = new Meeting;
-        $meeting->name = $request->name;
-        $meeting->founder_id = $request->session()->get('uid');
-        $meeting->content = $request->meeting_content;
+        $meeting = Meeting::fromRequest($request);
         $meeting->save();
 
         foreach ($groups as $group_string) {
@@ -97,67 +108,77 @@ class MeetingController extends Controller
         }
         return redirect('/home');
     }
+
     // meeting 생성 페이지에서 Ajax 요청을 받는 컨트롤러
     public function tryCreateGroup(Request $request)
     {
-
-        $request->validate([
-            'group_name' => ['required'],
 //       Best : 신청 시작 ->         신청 끝
 //                      행사 시작 ->        행사 끝
 //                                         행사 시작 -> 행사 끝
 //       특이 케이스: 행사 중에 신청을 받는 경우. -> 있을 수도 있는 상황.
 //         행사 끝나고 신청을 받기 시작 하는 경우 -> 안되게 처리.
+        $request->validate([
+            'group_name' => ['required'],
             'apply_start_date' => ['required'],
             'apply_end_date' => ['required', 'after_or_equal:apply_start_date'],
             'action_start_date' => ['required'],
             'action_end_date' => ['required', 'after_or_equal:action_start_date', 'after_or_equal:apply_start_date'],
             'capacity' => ['required', 'max:999', 'min:1']
         ]);
+
         $input = collect($request->all());
         $request->session()->push('groups', json_encode($input));
         return response()->json(['group' => json_encode($input)]);
     }
+
     //meeting 상세 보기 페이지
     public function detail(Request $request, $meetingId = null)
     {
         if ($meetingId == null) {
             return redirect('/meetings');
         }
-        $meeting = Meeting::where('id', $meetingId)->get()->first();
+
+        $meeting = $this->meetingService->getDetail($meetingId);
         if ($meeting == null) {
             return redirect('/meetings');
         }
-        $meeting->views = $meeting->views + 1;
-        $meeting->save();
-        $founder = User::where('id', $meeting->founder_id)->get()->first();
+
+        $founder = $this->userService->findById($meeting->founder_id);
+
         $groups = Group::where('meeting_id', $meeting->id)->withCount('applications')->get();
+
         return view('meetings.detail')->with([
             'meeting' => $meeting,
             'group_list' => $groups,
             'founder' => $founder
         ]);
     }
+
     // meeting 지원 페이지를 만드는 컨트롤러
     public function apply(Request $request, $meetingId = null, $groupId = null)
     {
-        $meeting = Meeting::where('id', $meetingId)->get()->first();
-        $group = Group::where('id', $groupId)->withCount('applications')->first();
-        $founder = User::where('id', $meeting->founder_id)->get()->first();
+        $meeting = $this->meetingService->findById($meetingId);
+        $group = Group::where('id', $groupId)->withCount('applications')->first(); // TODO : 그룹 서비스!
+        $founder = $this->userService->findById($meeting->founder_id);
+
         if ($meeting == null | $group == null) {
             return redirect('/home');
         }
+
         $already = Application::where('group_id', $groupId)->
-        where('user_id', $request->session()->get('uid'))->first();
+        where('user_id', $request->session()->get('uid'))->first(); // TODO :: application Service!
+
         if ($already != null) {
             $request->session()->flash('already', true);
         }
+
         return view('meetings.apply')->with([
             'meeting' => $meeting,
             'group' => $group,
             'founder' => $founder,
         ]);
     }
+
     // meeting 지원 post요청을 받는 컨트롤러.
     public function tryApplication(Request $request)
     {
@@ -165,17 +186,17 @@ class MeetingController extends Controller
             return redirect('login');
         }
         if (Application::where('group_id', $request->group_id)->
-            where('user_id', $request->session()->get('uid'))->first() != null
+            where('user_id', $request->session()->get('uid'))->first() != null // TODO :: application Service!
         ) {
             return redirect('/home'); // 신청하셨습니다.
         }
-        $user = User::where('id', $request->session()->get('uid'))->first();
-        $group = Group::where('id', $request->group_id)->withCount('applications')->first();
+        $user = $this->userService->findById($request->session()->get('uid'));
+        $group = Group::where('id', $request->group_id)->withCount('applications')->first(); // TODO:: group service!
         if ($user == null || $group == null) {
             return redirect('/home'); // 유효하지 않은 요청입니다.
         }
 
-        $apply = new Application;
+        $apply = new Application; // TODO :: application Service!
         $apply->user_id = $user->id;
         $apply->group_id = $group->id;
         $apply->reason = $request->reason;
@@ -185,7 +206,7 @@ class MeetingController extends Controller
             $apply->approval = false;
         }
         $apply->save();
-        return redirect('/meetings/detail/'.$group->meeting_id);
+        return redirect('/meetings/detail/' . $group->meeting_id);
 //        return redirect('') 리스트 쪽으로 리다이렉팅
     }
 

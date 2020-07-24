@@ -28,7 +28,7 @@ class UserRepositoryImpl implements UserRepository
             $user = $this->model->where('email',$email)->firstOrFail();
         }catch (ModelNotFoundException $e) {
             \Illuminate\Support\Facades\Log::notice('Email Not Found');
-            return false;
+            return null;
         }
         return $user;
     }
@@ -38,7 +38,7 @@ class UserRepositoryImpl implements UserRepository
             $user = $this->model->where('username',$username)->firstOrFail();
         }catch (ModelNotFoundException $e) {
             Log::notice('Username Not Found');
-            return false;
+            return null;
         }
         return $user;
     }
@@ -48,18 +48,18 @@ class UserRepositoryImpl implements UserRepository
             $user = $this->model->where('id',$id)->firstOrFail();
         }catch (ModelNotFoundException $e) {
             Log::notice('ID Not Found');
-            return false;
+            return null;
         }
         return $user;
     }
 
     public function updateEmail(int $id, string $email) {
         $user = $this->findById($id);
-        if (!$user) { // ID invalid
-            return false;
+        if (! $user) { // ID invalid
+            return null;
         }
-        if (!$this->findByEmail($email)) {// email Exist
-            return false;
+        if (! $this->findByEmail($email)) {// email Exist
+            return ;
         }
         $user->email = $email;
         $user->save();
@@ -70,10 +70,10 @@ class UserRepositoryImpl implements UserRepository
     public function updateUsername(int $id, string $username) {
         $user = $this->findById($id);
         if (!$user) { // ID invalid
-            return false;
+            return null;
         }
         if (!$this->findByUsername($username)) { // username exist
-            return false;
+            return null;
         }
         $user->username = $username;
         $user->save();
@@ -83,7 +83,7 @@ class UserRepositoryImpl implements UserRepository
     public function updatePassword(int $id, string $password) {
         $user = $this->findById($id);
         if (!$user) { // ID invalid
-            return false;
+            return null;
         }
         $user->password = Hash::make($password);
         $user->save();
@@ -93,7 +93,7 @@ class UserRepositoryImpl implements UserRepository
     public function updateName(int $id, string $name) {
         $user = $this->findById($id);
         if (!$user) { // ID invalid
-            return false;
+            return null;
         }
         $user->name = $name;
         $user->save();
@@ -107,7 +107,7 @@ class UserRepositoryImpl implements UserRepository
         if (!$user) {
             return false;
         }
-        if ( !Hash::check($password,$user->password)) {
+        if ( ! Hash::check($password,$user->password)) {
             return false;
         }
         return true;

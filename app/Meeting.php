@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Request;
 
 class Meeting extends Model
 {
@@ -26,4 +27,14 @@ class Meeting extends Model
     {
         $this->hasManyThrough('App\Application', 'App\Group', 'founder_id', 'group_id','id','id');
     }
+
+    public static function fromRequest(Request $request) {
+        $meeting = new Meeting;
+        $meeting->name = $request->name;
+        $meeting->founder_id = $request->session()->get('uid');
+        $meeting->content = $request->meeting_content;
+
+        return $meeting;
+    }
+
 }

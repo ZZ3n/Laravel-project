@@ -6,7 +6,7 @@ use App\Repositories\UserRepository;
 use App\User;
 use App\UserServiceInterface;
 use Illuminate\Http\Request;
-use App\Repositories\UserRepositoryImpl;
+
 class UserServiceImpl implements UserService {
 
     private $userRepository;
@@ -24,10 +24,35 @@ class UserServiceImpl implements UserService {
     public function login(Request $request)
     {
         $user = $this->userRepository->findByUsername($request->username);
-        if (!$this->userRepository->checkPassword($user->id,$request->password)) { //login failed
+        if (null == $this->userRepository->checkPassword($user->id,$request->password)) { //login failed
             return false;
         }
 
         return $user;
     }
+
+    public function findById(int $id)
+    {
+        $user = $this->userRepository->findById($id);
+        return $user;
+    }
+
+    public function findByUsername(string $username)
+    {
+        $user = $this->userRepository->findByUsername($username);
+
+        return $user;
+    }
+
+    public function update(Request $request)
+    {
+        $user = $this->userRepository->findByUsername($request->session('username'));
+        $this->userRepository->updateUsername($user->id,$request->username);
+        $this->userRepository->updatePassword($user->id,$request->password);
+        $this->userRepository->updateName($user->id,$request->name);
+        $this->userRepository->updateEmail($user->id,$request->email);
+
+        return $user;
+    }
+
 }

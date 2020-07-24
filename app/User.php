@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Contracts\Session\Session;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
@@ -32,6 +33,11 @@ class User extends Authenticatable
     public function applications() {
         //application을 소유하고 있음.
         return $this->hasMany('App\Application');
+    }
+
+    public static function fromSession(Session $session) {
+        $user = User::where('id', $session->get('uid'))->get()->first();
+        return $user;
     }
 
     public static function fromRequest(Request $request) {

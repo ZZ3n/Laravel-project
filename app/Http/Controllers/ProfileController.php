@@ -2,33 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Database\QueryException;
+use App\Services\MeetingService;
+use App\Services\UserService;
 use Illuminate\Http\Request;
-use App\User;
-use App\Meeting;
 use App\Application;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
+
 
 class ProfileController extends Controller
 {
+    protected $userService;
+    protected $meetingService;
+
+    function __construct(UserService $userService, MeetingService $meetingService) {
+        $this->userService = $userService;
+        $this->meetingService = $meetingService;
+    }
+
     public function getProfile(Request $request) {
         if ($request->session()->has('is_login') == false) {
             return redirect('/home');
         }
-        $user = User::where('id',$request->session()->get('uid'))->first();
-        $meetings = Meeting::where('founder_id',$user->id)->get();
-        $applications = Application::where('user_id',$user->id)
+        $user = $this->userService->findById($request->session()->get('uid'));
+        $meetings = $this->meetingService->findByFounder($user->id);
+
+        $applications = Application::where('user_id',$user->id) // TODO : application service!
             ->leftJoin('groups','groups.id','=','applications.group_id')
             ->groupBy('groups.meeting_id')
             ->select('groups.meeting_id','applications.approval','groups.name');
 
-        $user_apps = DB::table('meetings')->rightJoinSub($applications,'AG',function($join) {
+        $user_apps = DB::table('meetings')
+            ->rightJoinSub($applications,'AG',function($join) {
            $join->on('AG.meeting_id','=','meetings.id');
         })->select('AG.name as group_name','AG.meeting_id','meetings.id','meetings.name','AG.approval')
         ->get();
-
-//        ddd($user_apps);
 
         return view('Profile.profile',[
             'user' =>$user,
@@ -43,10 +50,11 @@ class ProfileController extends Controller
             'password' => ['required'],
             'email' => ['required']
         ]);
-        $user = User::where('username',$request->username)->first();
-        if (! Hash::check($request->password,$user->password)) { // password check failed
+
+        $user = $this->userService->login($request);
+
+        if ($user == false)
             return redirect('/profile');
-        }
 
         return view('Profile.modifyProfile',['user'=>$user]);
     }
@@ -60,18 +68,7 @@ class ProfileController extends Controller
             'password_confirmation' => ['required'],
         ]);
 
-        $user = User::where('username',$request->session()->get('username'))->first();
-
-        try {
-            $user->username = $request->username;
-            $user->password = Hash::make($request->password);
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->save();
-        }
-        catch(QueryException $exception) {
-            return back();
-        }
+        $user = $this->userService->update($request);
 
         $request->session()->forget(['is_login','uid','username']);
 
