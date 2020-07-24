@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\UserService;
 use App\Services\UserServiceImpl;
 use Illuminate\Http\Request;
-use App\User;
-use Illuminate\Support\Facades\Hash;
-use App\Repositories\UserRepository;
+
 
 class AuthController extends Controller {
     private $userService;
 
-    function __construct() {
-        $this->userService = new UserServiceImpl();
+    function __construct(UserService $userService) {
+        $this->userService = $userService;
     }
 
     public function register() {

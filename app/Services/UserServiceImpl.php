@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Repositories\UserRepository;
 use App\User;
 use App\UserServiceInterface;
 use Illuminate\Http\Request;
@@ -10,16 +11,13 @@ class UserServiceImpl implements UserService {
 
     private $userRepository;
 
-    function __construct() {
-        $this->userRepository = new UserRepositoryImpl();
+    function __construct(UserRepository $userRepository) {
+        $this->userRepository =$userRepository;
     }
 
     public function register(Request $request)
     {
         $user = User::fromRequest($request);
-        // 생성자가 중복이 되는가?
-        // userRepository -> new User를 하는데, User::fromRequest도 new User를 한다.
-        // Model에 Dependency가 생긴다... 좋지 못하다.
         $this->userRepository->store($user);
     }
 
