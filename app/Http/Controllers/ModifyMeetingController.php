@@ -4,10 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Application;
 use App\Group;
-use App\Meeting;
 use App\Services\MeetingService;
 use App\Services\UserService;
-use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 

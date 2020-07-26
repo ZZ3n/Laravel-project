@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Application;
-use App\Meeting;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
