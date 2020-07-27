@@ -162,8 +162,8 @@ class MeetingController extends Controller
         if ($meeting == null | $group == null) {
             return redirect('/home');
         }
-
-        $already = $this->applicationService->findById($groupId,$request->session()->get('uid'));
+        $uid = $request->session()->get('uid');
+        $already = $this->applicationService->findById($groupId,$uid);
 
         if ($already != null) {
             $request->session()->flash('already', true);
@@ -190,6 +190,7 @@ class MeetingController extends Controller
         }
         $user = $this->userService->findById($uid);
         $group = $this->groupService->findById($request->group_id,true);
+
         if ($user == null || $group == null) {
             return redirect('/home'); // 유효하지 않은 요청입니다.
         }

@@ -51,14 +51,10 @@ class ModifyMeetingController extends Controller
         if (!$request->session()->has('is_login')) {
             return redirect(route('home'));
         }
+
         $meeting = $this->meetingService->findById($meetingId);
-
         $groups = $this->groupService->findByMeetingId($meetingId,true);
-
-//        $applications = Application::leftJoin('users','users.id','=','applications.user_id')
-//            ->select('users.username','applications.*')
-//            ->get(); // TODO: view 단에서 meeting의 application 중에 if 로 골라서 출력함. 좋지 못함. 수정 필요.
-        $applications = $this->applicationService->findMeetingApplications($meetingId);
+        $applications = $this->applicationService->findMeetingApplications($meetingId); // TODO: view 단에서 meeting의 application 중에 if 로 골라서 출력함. 좋지 못함. 수정 필요.
 
         $founder = $this->userService->findById($meeting->founder_id);
         return view('meetings.modifyGroups',[
@@ -70,16 +66,16 @@ class ModifyMeetingController extends Controller
     }
 
     public function acceptUser(Request $request, $meetingId=null) {
-        $user = $this->userService->findByUsername($request->username);
 
+        $user = $this->userService->findByUsername($request->username);
         $this->applicationService->approval($request->group_id,$user->id);
 
         return back();
     }
 
     public function denyUser(Request $request,$meetingId = null) {
-        $user = $this->userService->findByUsername($request->username);
 
+        $user = $this->userService->findByUsername($request->username);
         $this->applicationService->deny($request->group_id,$user->id);
 
         return back();
