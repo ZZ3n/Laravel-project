@@ -3,7 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 
 class Meeting extends Model
 {
@@ -25,7 +25,7 @@ class Meeting extends Model
 
     public function applications()
     {
-        $this->hasManyThrough('App\Application', 'App\Group', 'founder_id', 'group_id','id','id');
+        return $this->hasManyThrough('App\Application', 'App\Group');
     }
 
     public static function fromRequest(Request $request) {

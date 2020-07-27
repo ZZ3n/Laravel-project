@@ -31,7 +31,7 @@ class GroupRepositoryImpl implements GroupRepository {
     public function findByMeetingId(int $meetingId)
     {
         try {
-            $group = $this->model->where('meeting_id',$meetingId)->firstOrFail();
+            $group = $this->model->where('meeting_id',$meetingId)->get();
         }catch (ModelNotFoundException $e) {
             Log::notice('Group::meeting_id Not Found');
             return null;

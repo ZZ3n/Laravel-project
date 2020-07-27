@@ -54,10 +54,11 @@ class ModifyMeetingController extends Controller
         $meeting = $this->meetingService->findById($meetingId);
 
         $groups = $this->groupService->findByMeetingId($meetingId,true);
-        $applications = Application::leftJoin('users','users.id','=','applications.user_id')
-            ->select('users.username','applications.*')
-            ->get();
-        // TODO: view 단에서 모든 application 중에 if 로 골라서 출력함. 좋지 못함. 수정 필요.
+
+//        $applications = Application::leftJoin('users','users.id','=','applications.user_id')
+//            ->select('users.username','applications.*')
+//            ->get(); // TODO: view 단에서 meeting의 application 중에 if 로 골라서 출력함. 좋지 못함. 수정 필요.
+        $applications = $this->applicationService->findMeetingApplications($meetingId);
 
         $founder = $this->userService->findById($meeting->founder_id);
         return view('meetings.modifyGroups',[

@@ -97,10 +97,10 @@
                 <div>승인 여부</div>
                 <div></div>
                 @foreach($applications as $application)
-                    @if($application->group_id == $group->id)
-                        <div>{{$application->username}}</div>
-                        <div>{{$application->reason}}</div>
-                        @if ($application->approval == 1)
+                    @if($application['group_id'] == $group->id)
+                        <div>{{$application['username']}}</div>
+                        <div>{{$application['reason']}}</div>
+                        @if ($application['approval'] == 1)
                             <div>승인됨</div>
                         @else
                             <div>거절됨</div>
@@ -108,7 +108,7 @@
                         <form method="POST">
                             @csrf
                             @method('PATCH')
-                            <input type="hidden" name="username" value="{{$application->username}}">
+                            <input type="hidden" name="username" value="{{$application['username']}}">
                             <input type="hidden" name="group_id" value="{{$group->id}}">
                             <input type="submit" value="승인"
                                    formaction="/meetings/modify/groups/{{$meeting->id}}/accept">

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Application;
+
 use App\Meeting;
 use App\Services\ApplicationService;
 use App\Services\GroupService;

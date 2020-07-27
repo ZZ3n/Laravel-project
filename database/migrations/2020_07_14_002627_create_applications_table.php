@@ -14,9 +14,9 @@ class CreateApplicationsTable extends Migration
     public function up()
     {
         Schema::create('applications', function (Blueprint $table) {
+            $table->increments('id');
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('group_id');
-            $table->primary(['user_id', 'group_id']);
             $table->string('reason')
                 ->nullable();
             $table->boolean('approval')

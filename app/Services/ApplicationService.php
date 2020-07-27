@@ -11,4 +11,5 @@ interface ApplicationService {
     public function deny(int $gid, int $uid);
     public function create(int $gid, int $uid, string $reason = null, bool $approval = false);
     public function findUserApplications(int $uid);
+    public function findMeetingApplications(int $meetingId);
 }
