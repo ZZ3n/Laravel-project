@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Log;
@@ -53,26 +54,14 @@ class UserRepositoryImpl implements UserRepository
         return $user;
     }
 
-    public function updateEmail(int $id, string $email) {
-        $user = $this->findById($id);
-        if (! $user) { // ID invalid
-            return null;
-        }
-        if ($this->findByEmail($email)) {// email Exist
-            return null;
-        }
-        $user->email = $email;
-        $user->save();
-
-        return $user;
-    }
-
     public function updateUsername(int $id, string $username) {
         $user = $this->findById($id);
         if (!$user) { // ID invalid
+            throw new \Exception('ID invalid',100);
             return null;
         }
         if ($this->findByUsername($username)) { // username exist
+            throw new \Exception('Username Exist',110);
             return null;
         }
         $user->username = $username;
@@ -80,9 +69,11 @@ class UserRepositoryImpl implements UserRepository
 
         return $user;
     }
+
     public function updatePassword(int $id, string $password) {
         $user = $this->findById($id);
         if (!$user) { // ID invalid
+            throw new \Exception('ID invalid',100);
             return null;
         }
         $user->password = Hash::make($password);
@@ -93,9 +84,25 @@ class UserRepositoryImpl implements UserRepository
     public function updateName(int $id, string $name) {
         $user = $this->findById($id);
         if (!$user) { // ID invalid
+            throw new \Exception('ID invalid',100);
             return null;
         }
         $user->name = $name;
+        $user->save();
+
+        return $user;
+    }
+    public function updateEmail(int $id, string $email) {
+        $user = $this->findById($id);
+        if (! $user) { // ID invalid
+            throw new \Exception('ID invalid',100);
+            return null;
+        }
+        if ($this->findByEmail($email)) {// email Exist
+            throw new \Exception('Email Exist',140);
+            return null;
+        }
+        $user->email = $email;
         $user->save();
 
         return $user;

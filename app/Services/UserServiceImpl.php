@@ -5,27 +5,34 @@ namespace App\Services;
 use App\Repositories\UserRepository;
 use App\User;
 use App\UserServiceInterface;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class UserServiceImpl implements UserService {
+class UserServiceImpl implements UserService
+{
 
     private $userRepository;
 
-    function __construct(UserRepository $userRepository) {
-        $this->userRepository =$userRepository;
+    function __construct(UserRepository $userRepository)
+    {
+        $this->userRepository = $userRepository;
     }
 
     public function register(Request $request)
     {
         $user = User::fromRequest($request);
-        $this->userRepository->store($user);
+        DB::transaction(function () use ($user) {
+            $this->userRepository->store($user);
+        }, 5);
+
     }
 
     public function login(Request $request)
     {
         $user = $this->userRepository->findByUsername($request->username);
-        if (null == $this->userRepository->checkPassword($user->id,$request->password)) { //login failed
+        if (null == $this->userRepository->checkPassword($user->id, $request->password)) { //login failed
             return false;
         }
 
@@ -48,15 +55,23 @@ class UserServiceImpl implements UserService {
     public function update(Request $request)
     {
         $user = $this->userRepository->findByUsername($request->session()->get('username'));
-        $check = collect();
-        if ($request->username != $user->username)
-            $check->push($this->userRepository->updateUsername($user->id,$request->username));
-        if (Hash::check($request->password,$user->password) == false)
-            $check->push($this->userRepository->updatePassword($user->id,$request->password));
-        if ($request->name != $user->name)
-            $check->push($this->userRepository->updateName($user->id,$request->name));
-        if ($request->email != $user->email)
-            $check->push($this->userRepository->updateEmail($user->id,$request->email));
+        try {
+            DB::beginTransaction();
+            if ($request->username != $user->username)
+                $this->userRepository->updateUsername($user->id, $request->username);
+            if (Hash::check($request->password, $user->password) == false)
+                $this->userRepository->updatePassword($user->id, $request->password);
+            if ($request->name != $user->name)
+                $this->userRepository->updateName($user->id, $request->name);
+            if ($request->email != $user->email)
+                $this->userRepository->updateEmail($user->id, $request->email);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            //TODO:: 예외상황 발생 알리기!
+            return null;
+        }
+
         return $user;
     }
 
