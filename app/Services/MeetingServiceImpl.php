@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\MeetingRepository;
+use App\Meeting;
 use Illuminate\Http\Request;
 
 class MeetingServiceImpl implements  MeetingService {
@@ -42,5 +43,11 @@ class MeetingServiceImpl implements  MeetingService {
         $meeting = $this->meetingRepository->findByFounder($founder_id);
 
         return $meeting;
+    }
+
+    public function store(Meeting $meeting)
+    {
+        $check = $this->meetingRepository->store($meeting);
+        return $check;
     }
 }

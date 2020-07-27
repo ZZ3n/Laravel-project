@@ -58,8 +58,8 @@ class UserRepositoryImpl implements UserRepository
         if (! $user) { // ID invalid
             return null;
         }
-        if (! $this->findByEmail($email)) {// email Exist
-            return ;
+        if ($this->findByEmail($email)) {// email Exist
+            return null;
         }
         $user->email = $email;
         $user->save();
@@ -72,7 +72,7 @@ class UserRepositoryImpl implements UserRepository
         if (!$user) { // ID invalid
             return null;
         }
-        if (!$this->findByUsername($username)) { // username exist
+        if ($this->findByUsername($username)) { // username exist
             return null;
         }
         $user->username = $username;

@@ -6,6 +6,7 @@ use App\Repositories\UserRepository;
 use App\User;
 use App\UserServiceInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserServiceImpl implements UserService {
 
@@ -46,12 +47,16 @@ class UserServiceImpl implements UserService {
 
     public function update(Request $request)
     {
-        $user = $this->userRepository->findByUsername($request->session('username'));
-        $this->userRepository->updateUsername($user->id,$request->username);
-        $this->userRepository->updatePassword($user->id,$request->password);
-        $this->userRepository->updateName($user->id,$request->name);
-        $this->userRepository->updateEmail($user->id,$request->email);
-
+        $user = $this->userRepository->findByUsername($request->session()->get('username'));
+        $check = collect();
+        if ($request->username != $user->username)
+            $check->push($this->userRepository->updateUsername($user->id,$request->username));
+        if (Hash::check($request->password,$user->password) == false)
+            $check->push($this->userRepository->updatePassword($user->id,$request->password));
+        if ($request->name != $user->name)
+            $check->push($this->userRepository->updateName($user->id,$request->name));
+        if ($request->email != $user->email)
+            $check->push($this->userRepository->updateEmail($user->id,$request->email));
         return $user;
     }
 

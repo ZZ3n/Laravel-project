@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Application;
 use App\Meeting;
+use App\Services\GroupService;
 use App\Services\MeetingService;
 use App\Services\UserService;
 use App\User;
@@ -20,11 +21,13 @@ class MeetingController extends Controller
 
     protected $meetingService;
     protected $userService;
+    protected $groupService;
 
-    function __construct(MeetingService $meetingService, UserService $userService)
+    function __construct(MeetingService $meetingService, UserService $userService,GroupService $groupService)
     {
         $this->meetingService = $meetingService;
         $this->userService = $userService;
+        $this->groupService = $groupService;
     }
 
     // meeting list를 만드는 컨트롤러
@@ -85,20 +88,11 @@ class MeetingController extends Controller
         }
 
         $meeting = Meeting::fromRequest($request);
-        $meeting->save();
+        $this->meetingService->store($meeting);
 
         foreach ($groups as $group_string) {
-            $info = json_decode($group_string);
-            $group = new Group;
-            $group->name = $info->group_name;
-            $group->capacity = $info->capacity;
-            $group->apply_start_date = $info->apply_start_date;
-            $group->apply_end_date = $info->apply_end_date;
-            $group->act_start_date = $info->action_start_date;
-            $group->act_end_date = $info->action_end_date;
-            $group->approval_opt = $info->apv_opt;
-            $group->meeting_id = $meeting->id;
-            $group->save();
+            $group = Group::fromSessionJson($meeting->id, $group_string);
+            $this->groupService->store($group);
         }
 
         //세션 정보 삭제하기.
@@ -158,7 +152,7 @@ class MeetingController extends Controller
     public function apply(Request $request, $meetingId = null, $groupId = null)
     {
         $meeting = $this->meetingService->findById($meetingId);
-        $group = Group::where('id', $groupId)->withCount('applications')->first(); // TODO : 그룹 서비스!
+        $group = $this->groupService->findById($groupId,true);
         $founder = $this->userService->findById($meeting->founder_id);
 
         if ($meeting == null | $group == null) {
@@ -166,7 +160,7 @@ class MeetingController extends Controller
         }
 
         $already = Application::where('group_id', $groupId)->
-        where('user_id', $request->session()->get('uid'))->first(); // TODO :: application Service!
+        where('user_id', $request->session()->get('uid'))->first(); // TODO :: application Service! find( G,U)
 
         if ($already != null) {
             $request->session()->flash('already', true);
@@ -186,17 +180,17 @@ class MeetingController extends Controller
             return redirect('login');
         }
         if (Application::where('group_id', $request->group_id)->
-            where('user_id', $request->session()->get('uid'))->first() != null // TODO :: application Service!
+            where('user_id', $request->session()->get('uid'))->first() != null // TODO :: application Service! find(G,U)
         ) {
             return redirect('/home'); // 신청하셨습니다.
         }
         $user = $this->userService->findById($request->session()->get('uid'));
-        $group = Group::where('id', $request->group_id)->withCount('applications')->first(); // TODO:: group service!
+        $group = $this->groupService->findById($request->group_id,true);
         if ($user == null || $group == null) {
             return redirect('/home'); // 유효하지 않은 요청입니다.
         }
 
-        $apply = new Application; // TODO :: application Service!
+        $apply = new Application; // TODO :: application Service! NEW application
         $apply->user_id = $user->id;
         $apply->group_id = $group->id;
         $apply->reason = $request->reason;

@@ -13,7 +13,7 @@ class MeetingRepositoryImpl implements MeetingRepository{
     }
 
     public function store(Meeting $meeting) {
-        $meeting->save();
+        return $meeting->save();
     }
 
     public function findById(int $id) {

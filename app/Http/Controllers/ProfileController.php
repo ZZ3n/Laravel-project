@@ -26,7 +26,7 @@ class ProfileController extends Controller
         $user = $this->userService->findById($request->session()->get('uid'));
         $meetings = $this->meetingService->findByFounder($user->id);
 
-        $applications = Application::where('user_id',$user->id) // TODO : application service!
+        $applications = Application::where('user_id',$user->id) // TODO : application service! findByUserId(U) with groupid
             ->leftJoin('groups','groups.id','=','applications.group_id')
             ->groupBy('groups.meeting_id')
             ->select('groups.meeting_id','applications.approval','groups.name');
@@ -65,11 +65,14 @@ class ProfileController extends Controller
             'email' => ['bail','required','email'],
             'name' => ['required','max:30'],
             'password' => ['required','confirmed'],
-            'password_confirmation' => ['required'],
+            'password_confirmation' => ['required'], // TODO :: custom으로 username, email 걸러내야함.
         ]);
 
         $user = $this->userService->update($request);
-
+        if ($user == null) {
+            // TODO : Alert Fail
+            return redirect('/home');
+        }
         $request->session()->forget(['is_login','uid','username']);
 
         return redirect('/home');

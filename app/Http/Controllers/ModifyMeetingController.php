@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Application;
 use App\Group;
+use App\Services\GroupService;
 use App\Services\MeetingService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
@@ -13,10 +14,15 @@ class ModifyMeetingController extends Controller
 {
     protected $meetingService;
     protected $userService;
+    protected $groupService;
 
-    function __construct(MeetingService $meetingService, UserService $userService) {
+    function __construct(
+        MeetingService $meetingService,
+        UserService $userService,
+        GroupService $groupService) {
         $this->meetingService = $meetingService;
         $this->userService = $userService;
+        $this->groupService = $groupService;
     }
 
     public function getMeeting(Request $request,$meetingId = null) {
@@ -47,7 +53,7 @@ class ModifyMeetingController extends Controller
         }
         $meeting = $this->meetingService->findById($meetingId);
 
-        $groups = Group::withCount('applications')->where('meeting_id',$meetingId)->get(); // TODO : GROUP SERVICE!
+        $groups = $this->groupService->findByMeetingId($meetingId,true);
         $applications = Application::leftJoin('users','users.id','=','applications.user_id')
             ->select('users.username','applications.*')
             ->get();
@@ -66,7 +72,7 @@ class ModifyMeetingController extends Controller
         $user = $this->userService->findByUsername($request->username);
 
         DB::table('applications')->where('group_id',$request->group_id)
-            ->where('user_id',$user->id)->update(['approval'=>true]); // TODO: applications service!
+            ->where('user_id',$user->id)->update(['approval'=>true]); // TODO: applications service! approval
 
         return back();
     }
@@ -75,7 +81,7 @@ class ModifyMeetingController extends Controller
         $user = $this->userService->findByUsername($request->username);
 
         DB::table('applications')->where('group_id',$request->group_id)
-            ->where('user_id',$user->id)->update(['approval'=>false]); // TODO: applications service!
+            ->where('user_id',$user->id)->update(['approval'=>false]); // TODO: applications service! approval
 
         return back();
     }

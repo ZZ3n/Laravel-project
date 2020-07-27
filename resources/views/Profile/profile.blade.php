@@ -85,6 +85,7 @@
         <a href="{{route('meetings').'/detail/'.$user_app->meeting_id}}">
             <div class="card">
                 <div class="name">{{$user_app->name}}</div>
+                <br>
                 그룹 이름: {{$user_app->group_name}}<br>
                 승인 여부: {{$user_app->approval}}
             </div>

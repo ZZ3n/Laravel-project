@@ -18,6 +18,9 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind('App\Services\MeetingService','App\Services\MeetingServiceImpl');
         $this->app->bind('App\Repositories\MeetingRepository','App\Repositories\MeetingRepositoryImpl');
+
+        $this->app->bind('App\Services\GroupService','App\Services\GroupServiceImpl');
+        $this->app->bind('App\Repositories\GroupRepository','App\Repositories\GroupRepositoryImpl');
     }
 
     /**
