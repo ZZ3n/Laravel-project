@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ApplicationService;
 use App\Services\MeetingService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
@@ -13,10 +14,12 @@ class ProfileController extends Controller
 {
     protected $userService;
     protected $meetingService;
+    protected $applicationService;
 
-    function __construct(UserService $userService, MeetingService $meetingService) {
+    function __construct(UserService $userService, MeetingService $meetingService, ApplicationService $applicationService) {
         $this->userService = $userService;
         $this->meetingService = $meetingService;
+        $this->applicationService = $applicationService;
     }
 
     public function getProfile(Request $request) {
@@ -25,17 +28,7 @@ class ProfileController extends Controller
         }
         $user = $this->userService->findById($request->session()->get('uid'));
         $meetings = $this->meetingService->findByFounder($user->id);
-
-        $applications = Application::where('user_id',$user->id) // TODO : application service! findByUserId(U) with groupid
-            ->leftJoin('groups','groups.id','=','applications.group_id')
-            ->groupBy('groups.meeting_id')
-            ->select('groups.meeting_id','applications.approval','groups.name');
-
-        $user_apps = DB::table('meetings')
-            ->rightJoinSub($applications,'AG',function($join) {
-           $join->on('AG.meeting_id','=','meetings.id');
-        })->select('AG.name as group_name','AG.meeting_id','meetings.id','meetings.name','AG.approval')
-        ->get();
+        $user_apps = $this->applicationService->findUserApplications($user->id);
 
         return view('Profile.profile',[
             'user' =>$user,

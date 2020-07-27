@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Application;
 use App\Meeting;
+use App\Services\ApplicationService;
 use App\Services\GroupService;
 use App\Services\MeetingService;
 use App\Services\UserService;
@@ -22,12 +23,15 @@ class MeetingController extends Controller
     protected $meetingService;
     protected $userService;
     protected $groupService;
+    protected $applicationService;
 
-    function __construct(MeetingService $meetingService, UserService $userService,GroupService $groupService)
+    function __construct(MeetingService $meetingService, UserService $userService,
+                         GroupService $groupService, ApplicationService $applicationService)
     {
         $this->meetingService = $meetingService;
         $this->userService = $userService;
         $this->groupService = $groupService;
+        $this->applicationService = $applicationService;
     }
 
     // meeting list를 만드는 컨트롤러
@@ -159,8 +163,7 @@ class MeetingController extends Controller
             return redirect('/home');
         }
 
-        $already = Application::where('group_id', $groupId)->
-        where('user_id', $request->session()->get('uid'))->first(); // TODO :: application Service! find( G,U)
+        $already = $this->applicationService->findById($groupId,$request->session()->get('uid'));
 
         if ($already != null) {
             $request->session()->flash('already', true);
@@ -176,30 +179,29 @@ class MeetingController extends Controller
     // meeting 지원 post요청을 받는 컨트롤러.
     public function tryApplication(Request $request)
     {
+
         if (!$request->session()->has('uid')) {
             return redirect('login');
         }
-        if (Application::where('group_id', $request->group_id)->
-            where('user_id', $request->session()->get('uid'))->first() != null // TODO :: application Service! find(G,U)
-        ) {
+        $uid = $request->session()->get('uid');
+
+        if ($this->applicationService->findById($request->group_id,$uid) != null) {
             return redirect('/home'); // 신청하셨습니다.
         }
-        $user = $this->userService->findById($request->session()->get('uid'));
+        $user = $this->userService->findById($uid);
         $group = $this->groupService->findById($request->group_id,true);
         if ($user == null || $group == null) {
             return redirect('/home'); // 유효하지 않은 요청입니다.
         }
 
-        $apply = new Application; // TODO :: application Service! NEW application
-        $apply->user_id = $user->id;
-        $apply->group_id = $group->id;
-        $apply->reason = $request->reason;
         if ($request->approval_opt == 'first') {
-            $apply->approval = true;
+            $approval = true;
         } else {
-            $apply->approval = false;
+            $approval = true;
         }
-        $apply->save();
+
+        $this->applicationService->create($group->id,$uid,$request->reason,$approval);
+
         return redirect('/meetings/detail/' . $group->meeting_id);
 //        return redirect('') 리스트 쪽으로 리다이렉팅
     }

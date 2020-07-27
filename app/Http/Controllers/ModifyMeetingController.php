@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Application;
 use App\Group;
+use App\Services\ApplicationService;
 use App\Services\GroupService;
 use App\Services\MeetingService;
 use App\Services\UserService;
@@ -15,14 +16,13 @@ class ModifyMeetingController extends Controller
     protected $meetingService;
     protected $userService;
     protected $groupService;
-
-    function __construct(
-        MeetingService $meetingService,
-        UserService $userService,
-        GroupService $groupService) {
+    protected $applicationService;
+    function __construct(MeetingService $meetingService, UserService $userService,
+        GroupService $groupService,ApplicationService $applicationService) {
         $this->meetingService = $meetingService;
         $this->userService = $userService;
         $this->groupService = $groupService;
+        $this->applicationService = $applicationService;
     }
 
     public function getMeeting(Request $request,$meetingId = null) {
@@ -71,8 +71,7 @@ class ModifyMeetingController extends Controller
     public function acceptUser(Request $request, $meetingId=null) {
         $user = $this->userService->findByUsername($request->username);
 
-        DB::table('applications')->where('group_id',$request->group_id)
-            ->where('user_id',$user->id)->update(['approval'=>true]); // TODO: applications service! approval
+        $this->applicationService->approval($request->group_id,$user->id);
 
         return back();
     }
@@ -80,8 +79,7 @@ class ModifyMeetingController extends Controller
     public function denyUser(Request $request,$meetingId = null) {
         $user = $this->userService->findByUsername($request->username);
 
-        DB::table('applications')->where('group_id',$request->group_id)
-            ->where('user_id',$user->id)->update(['approval'=>false]); // TODO: applications service! approval
+        $this->applicationService->deny($request->group_id,$user->id);
 
         return back();
     }

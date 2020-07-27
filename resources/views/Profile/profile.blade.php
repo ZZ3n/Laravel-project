@@ -82,12 +82,16 @@
         <h3>지원한 모임이 없습니다.</h3>
     @endif
     @foreach($user_apps as $user_app)
-        <a href="{{route('meetings').'/detail/'.$user_app->meeting_id}}">
+        <a href="{{route('meetings').'/detail/'.$user_app['meeting_id']}}">
             <div class="card">
-                <div class="name">{{$user_app->name}}</div>
+                <div class="name">{{$user_app['meeting_name']}}</div>
                 <br>
-                그룹 이름: {{$user_app->group_name}}<br>
-                승인 여부: {{$user_app->approval}}
+                그룹 이름: {{$user_app['group_name']}}<br>
+                @if ($user_app['approval'] == 0)
+                    승인 여부: 거절
+                @else
+                    승인 여부: 승인
+                @endif
             </div>
         </a>
     @endforeach
