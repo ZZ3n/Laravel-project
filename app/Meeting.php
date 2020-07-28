@@ -31,7 +31,7 @@ class Meeting extends Model
     public static function fromRequest(Request $request) {
         $meeting = new Meeting;
         $meeting->name = $request->name;
-        $meeting->founder_id = $request->session()->get('uid');
+        $meeting->founder_id = $request->user();
         $meeting->content = $request->meeting_content;
 
         return $meeting;

@@ -16,9 +16,9 @@ text-decoration: none;color : black; width: 100vw">
         <div>
 
         </div>
-        @if (session()->get('is_login') == true)
+        @if (request()->user())
 
-            <div><strong>{{session()->get('username')}}</strong> 님</div>
+            <div><strong>{{request()->user()->username}}</strong> 님</div>
                 <form action="{{route('logout')}}" method="post">
                     @csrf
                     <input type="submit" value="로그아웃">

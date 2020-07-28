@@ -47,11 +47,6 @@ class MeetingController extends Controller
     public function createMeeting(Request $request)
     {
         $request->session()->forget('groups');
-        $user = User::fromSession($request->session());
-        if ($user == null) {
-            //login 갔다가 다시 모임 개설 페이지로 오는 방법은?
-            return redirect('/login')->with('loginAlert', '로그인이 필요한 서비스입니다.');
-        }
         return view('meetings.create');
     }
 
@@ -121,7 +116,7 @@ class MeetingController extends Controller
         if ($meeting == null | $group == null) {
             return redirect('/home');
         }
-        $uid = $request->session()->get('uid');
+        $uid = $request->user()->id;
         $already = $this->applicationService->findById($groupId,$uid);
 
         if ($already != null) {
@@ -138,11 +133,7 @@ class MeetingController extends Controller
     // meeting 지원 post요청을 받는 컨트롤러.
     public function tryApplication(Request $request)
     {
-
-        if (!$request->session()->has('uid')) {
-            return redirect('login');
-        }
-        $uid = $request->session()->get('uid');
+        $uid = $request->user()->id;
 
         if ($this->applicationService->findById($request->group_id,$uid) != null) {
             return redirect('/home'); // 신청하셨습니다.

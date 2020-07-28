@@ -17,10 +17,6 @@ class HomeController extends Controller
     }
 
     public function home(Request $request) {
-        if ($request->session()->has('is_login') && $request->session()->get('is_login')) {
-            $user = User::where('id',$request->session()->get('uid'))->get()->first();
-        }
-
         $meetings = $this->meetingService->sortedAll();
 
         return view('home',['meetings' => $meetings]);

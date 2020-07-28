@@ -6,6 +6,7 @@ use App\Http\Requests\LoginUser;
 use App\Http\Requests\RegisterUser;
 use App\Services\UserService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 
 class AuthController extends Controller {
@@ -20,7 +21,6 @@ class AuthController extends Controller {
     }
 
     public function tryRegister(RegisterUser $request) {
-
         $this->userService->register($request);
 
         return redirect('/login');
@@ -36,17 +36,11 @@ class AuthController extends Controller {
         if (!$user) {
             return back()->with('loginError','패스워드가 일치하지 않습니다.');
         }
-
-        $request->session()->put([
-            'is_login' => true,
-            'uid' => $user->id,
-            'username' => $user->username,
-        ]);
         return redirect('/home');
     }
 
     public function logout(Request $request) {
-        $request->session()->forget(['is_login','uid','username']);
+        Auth::logout();
         return redirect('/home');
     }
 }

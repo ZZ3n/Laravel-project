@@ -72,7 +72,7 @@
     <div>{{$group->approval_opt}}</div>
 </div>
 <br>
-@if (session()->get('is_login') == true)
+@if (request()->user())
     <form action="" method="post">
         @csrf
         사유 :

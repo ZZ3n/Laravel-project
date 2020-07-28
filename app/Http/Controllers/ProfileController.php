@@ -7,6 +7,7 @@ use App\Services\MeetingService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use App\Application;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 
@@ -23,10 +24,8 @@ class ProfileController extends Controller
     }
 
     public function getProfile(Request $request) {
-        if ($request->session()->has('is_login') == false) {
-            return redirect('/home');
-        }
-        $user = $this->userService->findById($request->session()->get('uid'));
+
+        $user = $request->user();
         $meetings = $this->meetingService->findByFounder($user->id);
         $user_apps = $this->applicationService->findUserApplications($user->id);
 
@@ -44,10 +43,7 @@ class ProfileController extends Controller
             'email' => ['required']
         ]);
 
-        $user = $this->userService->login($request);
-
-        if ($user == false)
-            return redirect('/profile');
+        $user = $request->user();
 
         return view('Profile.modifyProfile',['user'=>$user]);
     }
@@ -58,7 +54,7 @@ class ProfileController extends Controller
             'email' => ['bail','required','email'],
             'name' => ['required','max:30'],
             'password' => ['required','confirmed'],
-            'password_confirmation' => ['required'], // TODO :: custom으로 username, email 걸러내야함.
+            'password_confirmation' => ['required'],
         ]);
 
         $user = $this->userService->update($request);
@@ -66,7 +62,7 @@ class ProfileController extends Controller
             // TODO : Alert Fail
             return redirect('/home');
         }
-        $request->session()->forget(['is_login','uid','username']);
+        Auth::logout();
 
         return redirect('/home');
     }

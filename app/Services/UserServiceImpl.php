@@ -7,6 +7,7 @@ use App\User;
 use App\UserServiceInterface;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -31,12 +32,17 @@ class UserServiceImpl implements UserService
 
     public function login(Request $request)
     {
-        $user = $this->userRepository->findByUsername($request->username);
-        if (null == $this->userRepository->checkPassword($user->id, $request->password)) { //login failed
-            return false;
+        $credentials = $request->only('username','password');
+        if (Auth::attempt($credentials)) {
+            $user = $this->userRepository->findByUsername($request->username);
+            return $user;
         }
+        return false;
+//        if (null == $this->userRepository->checkPassword($user->id, $request->password)) { //login failed
+//            return false;
+//        }
 
-        return $user;
+
     }
 
     public function findById(int $id)
@@ -54,7 +60,7 @@ class UserServiceImpl implements UserService
 
     public function update(Request $request)
     {
-        $user = $this->userRepository->findByUsername($request->session()->get('username'));
+        $user = $request->user();
         try {
             DB::beginTransaction();
             if ($request->username != $user->username)

@@ -27,16 +27,13 @@ class ModifyMeetingController extends Controller
     }
 
     public function getMeeting(Request $request,$meetingId = null) {
-        if (!$request->session('is_login')) {
+        if (!$request->user()) {
             return redirect(route('home'));
         }
-
         $meeting = $this->meetingService->findById($meetingId);
-        $user = $this->userService->findById($request->session()->get('uid'));
 
         return view('meetings.modify',[
             'meeting' => $meeting,
-            'user' => $user,
         ]);
     }
 
@@ -48,9 +45,6 @@ class ModifyMeetingController extends Controller
     }
 
     public function getGroups(Request $request, $meetingId = null) {
-        if (!$request->session()->has('is_login')) {
-            return redirect(route('home'));
-        }
 
         $meeting = $this->meetingService->findById($meetingId);
         $groups = $this->groupService->findByMeetingId($meetingId,true);

@@ -59,11 +59,12 @@
     <div id="sub">
         <div id="login-card">
             {{--login_ed--}}
-            @if(session()->get('is_login'))
+
+            @if(request()->user())
                 <div id="user-profile">
                     <form>
                         @csrf
-                        <h3>{{session()->get('username')}}님 환영합니다.</h3>
+                        <h3>{{request()->user()['username']}} 님 환영합니다.</h3>
                         <input type="submit" value="Logout" formmethod="post" formaction="{{route('logout')}}">
                     </form>
                     <a href="/profile">

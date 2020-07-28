@@ -14,6 +14,7 @@ class Authenticate extends Middleware
      */
     protected function redirectTo($request)
     {
+        $request->session()->flash('loginError','로그인이 필요한 서비스입니다.');
         if (! $request->expectsJson()) {
             return route('login');
         }
