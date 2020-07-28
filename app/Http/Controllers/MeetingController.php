@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 
+use App\Http\Requests\CreateGroup;
+use App\Http\Requests\CreateMeeting;
 use App\Meeting;
 use App\Services\ApplicationService;
 use App\Services\GroupService;
@@ -79,12 +81,8 @@ class MeetingController extends Controller
     }
 
     // meeting 생성 post 요청을 받는 컨트롤러 (meeting 생성)
-    public function tryCreateMeeting(Request $request)
+    public function tryCreateMeeting(CreateMeeting $request)
     {
-        $request->validate([
-            'name' => ['required'],
-            'meeting_content' => ['required'],
-        ]);
         //세션 정보 저장하기.
         $groups = collect($request->session()->get('groups'));
         if ($groups->isEmpty()) {
@@ -108,22 +106,8 @@ class MeetingController extends Controller
     }
 
     // meeting 생성 페이지에서 Ajax 요청을 받는 컨트롤러
-    public function tryCreateGroup(Request $request)
+    public function tryCreateGroup(CreateGroup $request)
     {
-//       Best : 신청 시작 ->         신청 끝
-//                      행사 시작 ->        행사 끝
-//                                         행사 시작 -> 행사 끝
-//       특이 케이스: 행사 중에 신청을 받는 경우. -> 있을 수도 있는 상황.
-//         행사 끝나고 신청을 받기 시작 하는 경우 -> 안되게 처리.
-        $request->validate([
-            'group_name' => ['required'],
-            'apply_start_date' => ['required'],
-            'apply_end_date' => ['required', 'after_or_equal:apply_start_date'],
-            'action_start_date' => ['required'],
-            'action_end_date' => ['required', 'after_or_equal:action_start_date', 'after_or_equal:apply_start_date'],
-            'capacity' => ['required', 'max:999', 'min:1']
-        ]);
-
         $input = collect($request->all());
         $request->session()->push('groups', json_encode($input));
         return response()->json(['group' => json_encode($input)]);

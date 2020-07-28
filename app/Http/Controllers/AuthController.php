@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginUser;
+use App\Http\Requests\RegisterUser;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 
@@ -17,14 +19,7 @@ class AuthController extends Controller {
         return view('register');
     }
 
-    public function tryRegister(Request $request) {
-       $validator = $request->validate([
-            'username' => ['bail','required','unique:users,username','max:30'],
-            'email' => ['bail','required','unique:users,email','email'],
-            'name' => ['required','max:30'],
-            'password' => ['required','confirmed'],
-            'password_confirmation' => ['required'],
-       ]);
+    public function tryRegister(RegisterUser $request) {
 
         $this->userService->register($request);
 
@@ -36,12 +31,7 @@ class AuthController extends Controller {
     }
 
 
-    public function tryLogin(Request $request) {
-        $validator = $request->validate([
-            'username' => ['bail','required','exists:users,username'],
-            'password' => ['required'],
-        ]);
-
+    public function tryLogin(LoginUser $request) {
         $user = $this->userService->login($request);
         if (!$user) {
             return back()->with('loginError','패스워드가 일치하지 않습니다.');

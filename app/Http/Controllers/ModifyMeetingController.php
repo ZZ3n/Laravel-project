@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Application;
 use App\Group;
+use App\Http\Requests\CreateMeeting;
 use App\Services\ApplicationService;
 use App\Services\GroupService;
 use App\Services\MeetingService;
@@ -39,8 +40,7 @@ class ModifyMeetingController extends Controller
         ]);
     }
 
-    public function postMeeting(Request $request,$meetingId = null) {
-        //TODO : validation
+    public function postMeeting(CreateMeeting $request,$meetingId = null) {
 
         $meeting = $this->meetingService->update($meetingId,$request);
 
