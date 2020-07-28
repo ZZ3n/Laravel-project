@@ -11,5 +11,5 @@ interface MeetingRepository {
     public function findById(int $id);
     public function findByFounder(int $userId);
     public function plusViews(Meeting $meeting);
-
+    public function sortedAll();
 }

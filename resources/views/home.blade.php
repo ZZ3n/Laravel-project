@@ -49,7 +49,8 @@
                 <a href="{{route('meetings').'/detail/'.$meeting->id}}">
                     <div>
                         <h3>{{$meeting->name}}</h3>
-                        {{$meeting->act_end_date}}
+                        조회수: {{$meeting->views}}<br>
+                        신청자 수 : {{$meeting->applications_count}}
                     </div>
                 </a>
             </div>

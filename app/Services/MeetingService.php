@@ -12,4 +12,5 @@ interface MeetingService {
     public function update(int $id,Request $request);
     public function findByFounder(int $founder_id);
     public function store(Meeting $meeting);
+    public function sortedAll();
 }

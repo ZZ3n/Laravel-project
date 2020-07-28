@@ -50,4 +50,9 @@ class MeetingServiceImpl implements  MeetingService {
         $check = $this->meetingRepository->store($meeting);
         return $check;
     }
+    public function  sortedAll()
+    {
+        $meetings = $this->meetingRepository->sortedAll();
+        return $meetings;
+    }
 }

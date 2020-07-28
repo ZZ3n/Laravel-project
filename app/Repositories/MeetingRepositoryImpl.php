@@ -42,5 +42,10 @@ class MeetingRepositoryImpl implements MeetingRepository{
         return $meeting->view;
     }
 
+    public function sortedAll()
+    {
+        return $this->model->withCount('applications')->orderBy('applications_count','desc')
+            ->orderBy('views','desc')->orderBy('created_at','desc')->get();
+    }
 
 }
