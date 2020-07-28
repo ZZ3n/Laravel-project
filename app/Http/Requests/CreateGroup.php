@@ -35,7 +35,7 @@ class CreateGroup extends FormRequest
             'apply_end_date' => ['required', 'after_or_equal:apply_start_date'],
             'action_start_date' => ['required'],
             'action_end_date' => ['required', 'after_or_equal:action_start_date', 'after_or_equal:apply_start_date'],
-            'capacity' => ['required', 'max:999', 'min:1']
+            'capacity' => ['required', 'numeric','max:999', 'min:1']
         ];
     }
 }

@@ -136,7 +136,7 @@
             e.preventDefault();
 
             var group_name = $('input[name="group_name"]').val();
-            var capacity = $('input[name="capacity"]').val();
+            var capacity = parseInt($('input[name="capacity"]').val());
             var apply_start_date = $('input[name="apply_start_date"]').val();
             var apply_end_date = $('input[name="apply_end_date"]').val();
             var action_start_date = $('input[name="action_start_date"]').val();
