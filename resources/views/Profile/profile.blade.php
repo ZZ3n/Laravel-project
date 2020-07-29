@@ -46,7 +46,8 @@
 @topNav
 @endtopNav
 <div id="profile">
-    <form action="/profile" method="post">
+    <form action="/profile/modify" method="post">
+        @method('GET')
         @csrf
         <h3>내 정보</h3>
         <p><strong>Username</strong> : <input name="username" type="text" value="{{$user->username}}" readonly></p>
@@ -63,14 +64,14 @@
     @foreach($meetings as $meeting)
         <div class="card">
             <div>
-                <a href="{{route('meetings').'/detail/'.$meeting->id}}">
+                <a href="{{route('meetings').'/'.$meeting->id}}">
                     <div class="name">{{$meeting->name,40}}</div>
                 </a>
             </div>
-            <a href="/meetings/modify/meeting/{{$meeting->id}}">
+            <a href="/meetings/{{$meeting->id}}/modify">
                 <button>수정하기</button>
             </a>
-            <a href="/meetings/modify/groups/{{$meeting->id}}">
+            <a href="/meetings/{{$meeting->id}}/modify/groups/">
                 <button>참가자 관리</button>
             </a>
         </div>
@@ -82,7 +83,7 @@
         <h3>지원한 모임이 없습니다.</h3>
     @endif
     @foreach($user_apps as $user_app)
-        <a href="{{route('meetings').'/detail/'.$user_app['meeting_id']}}">
+        <a href="{{route('meetings').'/'.$user_app['meeting_id']}}">
             <div class="card">
                 <div class="name">{{$user_app['meeting_name']}}</div>
                 <br>

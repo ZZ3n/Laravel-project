@@ -37,21 +37,21 @@ class MeetingController extends Controller
     }
 
     // meeting list를 만드는 컨트롤러
-    public function meetings(Request $request)
+    public function all(Request $request)
     {
         $meetings = $this->meetingService->sortedAll();
         return view('meetings.list', ['meetings' => $meetings]);
     }
 
-    // meeting 생성 get 요청을 받는 컨트롤러
-    public function createMeeting(Request $request)
+    // meeting 생성 페이지 컨트롤러
+    public function build(Request $request)
     {
         $request->session()->forget('groups');
         return view('meetings.create');
     }
 
-    // meeting 생성 post 요청을 받는 컨트롤러 (meeting 생성)
-    public function tryCreateMeeting(CreateMeeting $request)
+    // meeting 정보 저장 요청
+    public function store(CreateMeeting $request)
     {
         //세션 정보 저장하기.
         $groups = collect($request->session()->get('groups'));
@@ -75,15 +75,7 @@ class MeetingController extends Controller
         return redirect('/home');
     }
 
-    // meeting 생성 페이지에서 Ajax 요청을 받는 컨트롤러
-    public function tryCreateGroup(CreateGroup $request)
-    {
-        $input = collect($request->all());
-        $request->session()->push('groups', json_encode($input));
-        return response()->json(['group' => json_encode($input)]);
-    }
-
-    //meeting 상세 보기 페이지
+    //meeting 상세 보기
     public function detail(Request $request, $meetingId = null)
     {
         if ($meetingId == null) {
@@ -106,32 +98,8 @@ class MeetingController extends Controller
         ]);
     }
 
-    // meeting 지원 페이지를 만드는 컨트롤러
-    public function apply(Request $request, $meetingId = null, $groupId = null)
-    {
-        $meeting = $this->meetingService->findById($meetingId);
-        $group = $this->groupService->findById($groupId,true);
-        $founder = $this->userService->findById($meeting->founder_id);
-
-        if ($meeting == null | $group == null) {
-            return redirect('/home');
-        }
-        $uid = $request->user()->id;
-        $already = $this->applicationService->findById($groupId,$uid);
-
-        if ($already != null) {
-            $request->session()->flash('already', true);
-        }
-
-        return view('meetings.apply')->with([
-            'meeting' => $meeting,
-            'group' => $group,
-            'founder' => $founder,
-        ]);
-    }
-
-    // meeting 지원 post요청을 받는 컨트롤러.
-    public function tryApplication(Request $request)
+    // meeting 신청
+    public function apply(Request $request)
     {
         $uid = $request->user()->id;
 
@@ -153,7 +121,7 @@ class MeetingController extends Controller
 
         $this->applicationService->create($group->id,$uid,$request->reason,$approval);
 
-        return redirect('/meetings/detail/' . $group->meeting_id);
+        return redirect('/meetings/' . $group->meeting_id);
 //        return redirect('') 리스트 쪽으로 리다이렉팅
     }
 

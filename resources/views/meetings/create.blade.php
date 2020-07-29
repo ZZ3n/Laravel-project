@@ -147,7 +147,7 @@
 
             $.ajax({
                         type: 'POST',
-                        url: 'ajaxGroup',
+                        url: 'create/group',
                         data: {
                             group_name: group_name,
                             capacity: capacity,

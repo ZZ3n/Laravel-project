@@ -46,7 +46,7 @@
     <div id="main">
         @foreach($meetings as $meeting)
             <div class="meeting-card">
-                <a href="{{route('meetings').'/detail/'.$meeting->id}}">
+                <a href="meetings/{{$meeting->id}}">
                     <div>
                         <h3>{{$meeting->name}}</h3>
                         조회수: {{$meeting->views}}<br>

@@ -15,7 +15,7 @@
     <p><strong>현재 Username</strong> : {{$user->username}}</p>
     <p><strong>현재 Email</strong> : {{$user->email}} </p>
 </div>
-<form action="/profile/modify_user" method="post">
+<form action="/profile/modify" method="post">
     @csrf
     <h3>수정할 정보</h3>
     <p><strong>Username</strong> : <input name="username" type="text" value="{{$user->username}}"></p>

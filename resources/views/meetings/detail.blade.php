@@ -87,7 +87,7 @@
             {{--승인 방식 한글로 바꿔야 함.--}}
             <div>승인방식 : {{$group->approval_opt}}</div>
             <br>
-            <a href="{{route('meetings')}}/detail/{{$meeting->id}}/{{$group->id}}">
+            <a href="{{$meeting->id}}/groups/{{$group->id}}">
                 <button>신청하기</button>
             </a>
         </div>

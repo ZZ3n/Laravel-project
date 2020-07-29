@@ -23,7 +23,7 @@ class ProfileController extends Controller
         $this->applicationService = $applicationService;
     }
 
-    public function getProfile(Request $request) {
+    public function get(Request $request) {
 
         $user = $request->user();
         $meetings = $this->meetingService->findByFounder($user->id);
@@ -36,7 +36,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function gotoModifyProfile(Request $request) {
+    public function fix(Request $request) {
         $validator = $request->validate([
             'username' => ['bail','required','exists:users,username'],
             'password' => ['required'],
@@ -48,7 +48,7 @@ class ProfileController extends Controller
         return view('Profile.modifyProfile',['user'=>$user]);
     }
 
-    public function modifyProfile(Request $request) {
+    public function update(Request $request) {
         $validator = $request->validate([
             'username' => ['bail','required','max:30'],
             'email' => ['bail','required','email'],

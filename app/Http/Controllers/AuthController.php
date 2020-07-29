@@ -16,11 +16,11 @@ class AuthController extends Controller {
         $this->userService = $userService;
     }
 
-    public function register() {
+    public function getRegister() {
         return view('register');
     }
 
-    public function tryRegister(RegisterUser $request) {
+    public function postRegister(RegisterUser $request) {
         $this->userService->register($request);
 
         return redirect('/login');

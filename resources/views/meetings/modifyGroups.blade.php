@@ -111,8 +111,8 @@
                             <input type="hidden" name="username" value="{{$application['username']}}">
                             <input type="hidden" name="group_id" value="{{$group->id}}">
                             <input type="submit" value="승인"
-                                   formaction="/meetings/modify/groups/{{$meeting->id}}/accept">
-                            <input type="submit" value="거절" formaction="/meetings/modify/groups/{{$meeting->id}}/deny">
+                                   formaction="/meetings/{{$meeting->id}}/modify/groups/accept">
+                            <input type="submit" value="거절" formaction="/meetings/{{$meeting->id}}/modify/groups/deny">
                         </form>
                     @endif
                 @endforeach

@@ -11,8 +11,8 @@
 |
 */
 //register
-Route::get('/register', 'AuthController@register')->name('register');
-Route::post('/register', 'AuthController@tryRegister')->name('tryRegister');
+Route::get('/register', 'AuthController@getRegister')->name('register');
+Route::post('/register', 'AuthController@postRegister')->name('tryRegister');
 
 //login
 Route::get('/login', 'AuthController@login')->name('login');
@@ -27,30 +27,32 @@ Route::post('/logout', 'AuthController@logout')->name('logout');
 
 // 개인 정보 관련 ( 수정 )
 Route::prefix('/profile')->group(function () {
-    Route::get('', 'ProfileController@getProfile')->middleware('auth');
-    Route::post('', 'ProfileController@gotoModifyProfile')->middleware('auth');
-    Route::post('/modify_user', 'ProfileController@modifyProfile')->middleware('auth');
+    Route::get('', 'ProfileController@get')->middleware('auth');
+    Route::get('/modify', 'ProfileController@fix')->middleware('auth');
+    Route::post('/modify', 'ProfileController@update')->middleware('auth');
 });
 
 // 모임 정보 관련 CRUD 요청
+Route::permanentRedirect('/meetings/{meetingId?}/groups', '/meetings/{meetingId?}');
+
 Route::prefix('meetings')->group(function () {
     //Meetings List
-    Route::get('', 'MeetingController@meetings')->name('meetings');
+    Route::get('', 'MeetingController@all')->name('meetings');
     // Create meetings and groups
-    Route::get('create', 'MeetingController@createMeeting')->name('createMeeting')->middleware('auth');
-    Route::post('create', 'MeetingController@tryCreateMeeting')->name('tryCreateMeeting')->middleware('auth');
-    Route::post('ajaxGroup', 'MeetingController@tryCreateGroup')->middleware('auth');
+    Route::get('create', 'MeetingController@build')->name('createMeeting')->middleware('auth');
+    Route::post('create', 'MeetingController@store')->name('tryCreateMeeting')->middleware('auth');
+    Route::post('create/group', 'GroupController@build')->middleware('auth');
     // 모임-그룹 신청
-    Route::get('detail/{meetingId?}', 'MeetingController@detail');
-    Route::get('detail/{meetingId?}/{groupId?}', 'MeetingController@apply')->middleware('auth');
-    Route::post('detail/{meetingId?}/{groupId?}', 'MeetingController@tryApplication')->middleware('auth');
+    Route::get('{meetingId?}', 'MeetingController@detail');
+    Route::get('{meetingId?}/groups/{groupId?}', 'GroupController@select')->middleware('auth');
+    Route::post('{meetingId?}/groups/{groupId?}', 'MeetingController@apply')->middleware('auth');
     // 모임 수정
-    Route::get('modify/meeting/{meetingId?}', 'ModifyMeetingController@getMeeting')->middleware('auth');
-    Route::post('modify/meeting/{meetingId?}', 'ModifyMeetingController@postMeeting')->middleware('auth');
+    Route::get('{meetingId?}/modify', 'ManageMeetingController@fix')->middleware('auth');
+    Route::post('{meetingId?}/modify', 'ManageMeetingController@update')->middleware('auth');
     // 그룹 수정
-    Route::get('modify/groups/{meetingId?}', 'ModifyMeetingController@getGroups')->middleware('auth');
-    Route::patch('modify/groups/{meetingId?}/accept','ModifyMeetingController@acceptUser')->middleware('auth');
-    Route::patch('modify/groups/{meetingId?}/deny','ModifyMeetingController@denyUser')->middleware('auth');
+    Route::get('{meetingId?}/modify/groups', 'GroupController@manage')->middleware('auth');
+    Route::patch('{meetingId?}/modify/groups/accept','ManageMeetingController@acceptUser')->middleware('auth');
+    Route::patch('{meetingId?}/modify/groups/deny','ManageMeetingController@denyUser')->middleware('auth');
 });
 
 

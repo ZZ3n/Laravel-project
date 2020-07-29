@@ -37,7 +37,7 @@
 @endtopNav
 <div id="meetings">
     @foreach($meetings as $meeting)
-        <a href="{{route('meetings').'/detail/'.$meeting->id}}">
+        <a href="{{route('meetings').'/'.$meeting->id}}">
             <div class="meeting-card">
                 <div><h3>{{$meeting->name,20}}</h3></div>
                 <br>
