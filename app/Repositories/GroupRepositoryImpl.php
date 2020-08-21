@@ -1,8 +1,13 @@
 <?php
 
 namespace App\Repositories;
+
 use App\Group;
-class GroupRepositoryImpl implements GroupRepository {
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Log;
+
+class GroupRepositoryImpl implements GroupRepository
+{
 
     protected $model;
 
@@ -20,8 +25,8 @@ class GroupRepositoryImpl implements GroupRepository {
     public function findById(int $id)
     {
         try {
-            $group = $this->model->where('id',$id)->firstOrFail();
-        }catch (ModelNotFoundException $e) {
+            $group = $this->model->where('id', $id)->firstOrFail();
+        } catch (ModelNotFoundException $e) {
             Log::notice('Group::ID Not Found');
             return null;
         }
@@ -31,31 +36,26 @@ class GroupRepositoryImpl implements GroupRepository {
     public function findByMeetingId(int $meetingId)
     {
         try {
-            $group = $this->model->where('meeting_id',$meetingId)->get();
-        }catch (ModelNotFoundException $e) {
+            $group = $this->model->where('meeting_id', $meetingId)->get();
+
+        } catch (ModelNotFoundException $e) {
             Log::notice('Group::meeting_id Not Found');
             return null;
         }
         return $group;
     }
 
-    public function findByActive($date)
-    {
-        $groups = $this->model->where('act_end_date','>=',now())->get();
-        return $groups;
-    }
-
 
     public function findByMeetingIdApplicationCount(int $meetingId)
     {
-        $groups = $this->model->withCount('applications')->where('meeting_id',$meetingId)->get();
+        $groups = $this->model->withCount('applications')->where('meeting_id', $meetingId)->get();
 
         return $groups;
     }
 
     public function findByIdApplicationCount(int $id)
     {
-        $groups = $this->model->withCount('applications')->where('id',$id)->first();
+        $groups = $this->model->withCount('applications')->where('id', $id)->first();
 
         return $groups;
     }

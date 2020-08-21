@@ -6,9 +6,7 @@ use App\Services\ApplicationService;
 use App\Services\MeetingService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
-use App\Application;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 
 class ProfileController extends Controller

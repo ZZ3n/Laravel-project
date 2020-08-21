@@ -3,6 +3,8 @@
 namespace App\Repositories;
 
 use App\Meeting;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Log;
 
 class MeetingRepositoryImpl implements MeetingRepository{
 

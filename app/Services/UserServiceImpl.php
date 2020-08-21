@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Repositories\UserRepository;
 use App\User;
-use App\UserServiceInterface;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

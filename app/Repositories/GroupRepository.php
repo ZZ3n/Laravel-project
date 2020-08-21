@@ -9,7 +9,6 @@ interface GroupRepository {
     public function store(Group $group);
     public function findById(int $id);
     public function findByMeetingId(int $meetingId);
-    public function findByActive($date);
     public function findByMeetingIdApplicationCount(int $meetingId);
     public function findByIdApplicationCount(int $id);
 }

@@ -28,7 +28,7 @@ class UserRepositoryImpl implements UserRepository
         try {
             $user = $this->model->where('email',$email)->firstOrFail();
         }catch (ModelNotFoundException $e) {
-            \Illuminate\Support\Facades\Log::notice('Email Not Found');
+          Log::notice('Email Not Found');
             return null;
         }
         return $user;

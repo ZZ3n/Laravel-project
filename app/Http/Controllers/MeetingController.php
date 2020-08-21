@@ -3,17 +3,14 @@
 namespace App\Http\Controllers;
 
 
-use App\Http\Requests\CreateGroup;
 use App\Http\Requests\CreateMeeting;
 use App\Meeting;
 use App\Services\ApplicationService;
 use App\Services\GroupService;
 use App\Services\MeetingService;
 use App\Services\UserService;
-use App\User;
 use App\Group;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 /*
  * 모임 전반을 관리하는 컨트롤러

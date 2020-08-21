@@ -21,7 +21,7 @@ class User extends Authenticatable
     ];
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'username' => 'string',
+        'username' => 'srtring',
         'name' => 'string',
     ];
 
@@ -31,13 +31,8 @@ class User extends Authenticatable
     }
 
     public function applications() {
-        //application을 소유하고 있음.
+        //application 을 소유하고 있음.
         return $this->hasMany('App\Application');
-    }
-
-    public static function fromSession(Session $session) {
-        $user = User::where('id', $session->get('uid'))->get()->first();
-        return $user;
     }
 
     public static function fromRequest(Request $request) {

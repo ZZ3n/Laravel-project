@@ -22,7 +22,7 @@
 @topNav
 @endtopNav
 
-<form id="meeting_form" method="POST" action="/meetings/modify/meeting/{{$meeting->id}}">
+<form id="meeting_form" method="POST" action="/meetings/{{$meeting->id}}/modify">
     @csrf
     <h3>모임 정보</h3>
     <div>제목</div>

@@ -2,17 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Application;
-use App\Group;
 use App\Http\Requests\CreateMeeting;
 use App\Services\ApplicationService;
 use App\Services\GroupService;
 use App\Services\MeetingService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
-class ModifyMeetingController extends Controller
+class ManageMeetingController extends Controller
 {
     protected $meetingService;
     protected $userService;
@@ -45,7 +42,7 @@ class ModifyMeetingController extends Controller
 
         $meeting = $this->meetingService->update($meetingId, $request);
 
-        return redirect(route('meetings') . '/detail/' . $meeting->id);
+        return redirect(route('meetings')  .'/'. $meeting->id);
     }
 
     public function acceptUser(Request $request, $meetingId = null)
